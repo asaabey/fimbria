@@ -1,0 +1,16 @@
+node_modules
+dist
+data
+.git
+.env
+test-results
+playwright-report
+.env.*
+*.pem
+*.key
+credentials.json
+secrets.yaml
+secrets.yml
+*.sqlite
+*.sqlite-*
+.DS_Store
