@@ -1,17 +1,28 @@
 import {test,expect} from '@playwright/test';
 test('teacher presents and two isolated students vote',async({page,browser})=>{
+  await page.setViewportSize({width: 1366, height: 768});
   await page.goto('/');
   await page.getByLabel('Password').fill('browser-test-password');await page.getByRole('button',{name:'Sign in',exact:true}).click();
   await page.getByLabel('Upload lesson JSON').setInputFiles('examples/intro.json');
+  await expect(page.getByRole('button',{name:'Start session',exact:true})).toBeInViewport();
+  await expect(page.getByLabel('Saved lessons')).toBeInViewport();
+  await page.screenshot({path:'test-results/teacher-preparation-desktop.png',fullPage:true});
   await page.getByRole('button',{name:'Start session',exact:true}).click();
   await expect(page.getByText('Ready when you are.')).toBeVisible();
   const url=await page.locator('section a').first().getAttribute('href');
-  const contexts=await Promise.all([browser.newContext(),browser.newContext()]);
+  const contexts=await Promise.all([browser.newContext({viewport:{width:375,height:812},isMobile:true,hasTouch:true}),browser.newContext({viewport:{width:320,height:568},isMobile:true,hasTouch:true})]);
   const students=await Promise.all(contexts.map(c=>c.newPage()));
   for(const s of students){await s.goto(url!);await s.getByRole('button',{name:'Join',exact:true}).click();await expect(s.getByText('Waiting for your teacher…')).toBeVisible();}
   await page.getByRole('button',{name:'Begin lesson'}).click();
   await page.getByRole('button',{name:'Next',exact:true}).click();await page.getByRole('button',{name:'Next',exact:true}).click();
-  for(const s of students){await s.getByRole('button',{name:/A\. It can/}).click();await expect(s.getByText('Answer submitted and saved.')).toBeVisible();}
+  await expect(page.getByRole('button',{name:'Next',exact:true})).toBeInViewport();
+  await expect(page.getByRole('button',{name:'Reveal results'})).toBeInViewport();
+  await page.screenshot({path:'test-results/teacher-live-desktop.png',fullPage:true});
+  for(const s of students){
+    expect(await s.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    await expect(s.getByRole('button',{name:/A\. It can/})).toBeInViewport();
+    await s.getByRole('button',{name:/A\. It can/}).click();await expect(s.getByText('Answer submitted and saved.')).toBeVisible();}
+  await students[0].screenshot({path:'test-results/student-mobile.png',fullPage:true});
   await students[0].reload();await expect(students[0].getByText('Answer submitted and saved.')).toBeVisible();
   await page.getByRole('button',{name:'Reveal results'}).click();
   await expect(students[0].getByText(/2 responses/)).toBeVisible();

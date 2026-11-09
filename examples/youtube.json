@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "youtube-lesson",
+  "title": "A lesson with YouTube",
+  "steps": [
+    {
+      "id": "intro",
+      "type": "slide",
+      "title": "Watch and predict",
+      "body": "Watch the animation, then answer the question."
+    },
+    {
+      "id": "animation",
+      "type": "video",
+      "title": "YouTube explanation",
+      "src": "https://www.youtube.com/watch?v=M7lc1UVf-VE"
+    },
+    {
+      "id": "reflection",
+      "type": "question",
+      "prompt": "Did the animation match your prediction?",
+      "options": [
+        {
+          "id": "yes",
+          "text": "Yes"
+        },
+        {
+          "id": "no",
+          "text": "No"
+        }
+      ],
+      "correctOptionId": "yes",
+      "explanation": "Replace this sample question and answer with one for your video."
+    }
+  ]
+}

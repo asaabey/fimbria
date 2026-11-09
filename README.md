@@ -94,3 +94,39 @@ The server only downloads from raw.githubusercontent.com over HTTPS, rejects red
 The header theme selector offers System, Light, Dark and Paper appearances, remembered per browser. Headings use a local serif font with a sans-serif interface; no font service is required.
 
 To run browser tests while a local application already uses port 3000, choose another test port: `TEST_PORT=3002 npm run test:browser`. The test server uses its own database and does not change the live teacher account.
+
+## Embed MP4 and YouTube videos
+
+Put your MP4 files in `public/media/` (for example, `public/media/gradient.mp4`). Vite serves them at `/media/gradient.mp4` during development and copies them into production builds. Rebuild/redeploy after adding files. These are public static assets; SQLite backups do not include them, so keep the originals separately.
+
+Add a video object anywhere in your lesson's `steps` array, between slides or questions:
+
+```json
+{
+  "id": "gradient-video",
+  "type": "video",
+  "title": "Understanding gradients",
+  "src": "/media/gradient.mp4"
+}
+```
+
+See `examples/video.json` for a complete lesson; replace its placeholder path with your own MP4 before uploading. You can also use a direct public HTTPS MP4 URL. Video sources must be site-relative paths or HTTPS URLs; computer file paths are not playable sources. Use browser-compatible MP4 encoding such as H.264 video with AAC audio.
+
+Videos appear in the teacher preview, host, presentation display and student views with play/pause, seeking, volume and fullscreen controls. Playback is manual and independent on each screen; host navigation changes the lesson step for everyone, but does not synchronize video playback. For classroom projection, play the video on the presentation display. Leaving a video step stops its playback.
+
+Optionally add `"captionsSrc": "/media/gradient.en.vtt"` for English WebVTT captions. Place that file alongside the MP4. When using external caption URLs, both the video and caption hosts must allow cross-origin requests. Missing or unsupported videos show an error and an open-video link.
+
+For YouTube, use the same `video` step with a YouTube link in `src`:
+
+```json
+{
+  "id": "youtube-video",
+  "type": "video",
+  "title": "YouTube explanation",
+  "src": "https://www.youtube.com/watch?v=M7lc1UVf-VE"
+}
+```
+
+See `examples/youtube.json` for a complete lesson. Watch links, `youtu.be` share links, Shorts, live-video links and embed links are supported. Start times such as `?t=90`, `?t=1m30s` or `?start=90` are preserved. Links must identify a single video; playlist-only and channel links are rejected. Additional URL parameters are not passed to the player.
+
+YouTube steps use the embedded YouTube player in preview and all classroom views, with a **Watch on YouTube** fallback link. They require internet access and embedding enabled by the video owner; unavailable, private or restricted videos may not play in the app. Playback remains manual and independent per screen. Use YouTube's own captions for these steps; `captionsSrc` applies only to MP4 steps. No API key or server-side download is required. Player integration follows [YouTube's embed documentation](https://developers.google.com/youtube/player_parameters).

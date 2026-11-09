@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- YouTube video links in lesson steps, including watch/share/Shorts/live/embed URLs and start times.
+- Embedded MP4 lesson steps with responsive playback controls, optional captions, media error feedback and a sample video lesson.
+
 - Teacher login, immutable JSON lesson uploads and public GitHub imports with validation and preview.
 - Live slide presentation, six-digit room codes, QR joining, single-answer voting and teacher-controlled results.
 - Persistent lessons, session progress, participant credentials and recorded answers with reconnect recovery.
@@ -17,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docker Compose deployment, teacher password setup/reset commands, consistent SQLite backups, and deployment guidance for fimbria.lattice-1.com.
 
 ### Changed
+
+- Keep teacher lesson previews and session controls alongside lesson content, and improve student layouts and answer visibility on mobile.
 
 ### Deprecated
 

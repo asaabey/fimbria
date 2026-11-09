@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "video-lesson",
+  "title": "A lesson with video",
+  "steps": [
+    {
+      "id": "intro",
+      "type": "slide",
+      "title": "Watch and predict",
+      "body": "Watch the animation, then answer the question."
+    },
+    {
+      "id": "animation",
+      "type": "video",
+      "title": "Your animation",
+      "src": "/media/your-video.mp4"
+    },
+    {
+      "id": "reflection",
+      "type": "question",
+      "prompt": "Did the animation match your prediction?",
+      "options": [
+        {"id": "yes", "text": "Yes"},
+        {"id": "no", "text": "No"}
+      ],
+      "correctOptionId": "yes",
+      "explanation": "Replace this sample question and answer with one for your video."
+    }
+  ]
+}

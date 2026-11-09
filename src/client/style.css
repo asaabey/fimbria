@@ -97,3 +97,101 @@ li p { margin: 6px 0; }
   nav button { flex: 1; }
   .wordmark span { font-size: .75rem; }
 }
+
+/* Teacher workspace: keep preparation and live controls alongside the lesson. */
+.teacher-home, .teacher-session { max-width: 1440px; padding: 24px 32px; }
+.teacher-home header, .teacher-session header { padding-bottom: 20px; }
+.teacher-home h1 { margin: 8px 0; font-size: 2.4rem; }
+.teacher-home h1 + p { margin: 8px 0 16px; }
+.sign-out { float: right; margin-top: -60px; }
+.preparation-grid { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 24px; }
+.preparation-grid > section { margin: 0; padding: 24px; min-width: 0; }
+.preparation-grid h2 { margin-top: 0; }
+.lesson-setup label { margin-bottom: 16px; }
+.lesson-setup input, .lesson-setup select { padding: 10px; }
+.github-import { margin: 16px 0; padding-bottom: 16px; }
+.github-import h3 { margin: 12px 0 4px; }
+.github-import p { font-size: .85rem; line-height: 1.5; margin: 8px 0 12px; }
+.lesson-preview { display: flex; flex-direction: column; }
+.preview-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.preview-heading h2 { font-size: 1.5rem; margin-bottom: 8px; }
+.preview-heading p { margin: 0; font-size: .85rem; }
+.preview-heading button { flex-shrink: 0; }
+.preview-steps { overflow-y: auto; max-height: 48vh; margin-bottom: 0; padding-left: 28px; scrollbar-gutter: stable; }
+.preview-steps li { border-bottom: 1px solid var(--border); padding: 12px 8px; }
+.preview-steps p { font-size: .9rem; line-height: 1.5; }
+.empty-preview { margin: auto; max-width: 420px; text-align: center; padding: 32px 0; }
+.resume-sessions { margin: 20px 0; padding: 16px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.resume-sessions h2 { font-size: 1.2rem; margin: 0; }
+.resume-sessions p { margin: 0; }
+.session-title { font-size: clamp(1.6rem, 3vw, 2.3rem); margin: 12px 0 20px; }
+.session-grid { min-width: 0; }
+.session-grid > section { margin: 0; min-width: 0; }
+.session-grid h2 { margin-top: 0; }
+.teacher-session .session-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+.teacher-controls { position: sticky; top: 24px; padding: 24px; }
+.teacher-controls h2 { font-size: 1.3rem; }
+.teacher-controls p { font-weight: 600; }
+.teacher-controls a { font-size: .9rem; }
+.teacher-controls nav { display: grid; grid-template-columns: 1fr 1fr; }
+.teacher-controls nav button { padding: 12px 8px; }
+.teacher-controls nav button:nth-child(n+3), .teacher-controls nav button:only-child { grid-column: 1 / -1; }
+.teacher-home footer, .teacher-session footer { margin-top: 24px; }
+.teacher-session .options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.teacher-session .options > div { background: var(--answer); padding: 12px 16px; border-radius: 6px; overflow-wrap: anywhere; }
+.teacher-session .options p { margin: 0; }
+.teacher-session .body { line-height: 1.6; }
+.student-view { max-width: 640px; }
+.student-view header { padding-bottom: 24px; }
+.student-view h1 { font-size: 2rem; }
+.student-view .session-title { font-size: 1.25rem; color: var(--muted); }
+.student-view .session-grid h2 { font-size: 1.65rem; line-height: 1.35; }
+.student-view .answer { min-height: 56px; padding: 16px; line-height: 1.5; white-space: normal; overflow-wrap: anywhere; }
+.answer.selected:disabled { opacity: 1; border: 2px solid var(--accent); background: var(--answer); }
+.code-input { text-align: center; font-size: 1.75rem; letter-spacing: .18em; font-variant-numeric: tabular-nums; }
+.student-view form button { width: 100%; }
+.student-view progress { width: 100%; }
+.student-view .body { overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .preparation-grid { grid-template-columns: 1fr; }
+  .teacher-session .session-grid { grid-template-columns: minmax(0, 1fr); }
+  .teacher-controls { position: sticky; top: auto; bottom: 12px; box-shadow: 0 6px 24px #0002; }
+  .teacher-controls nav { display: flex; margin-top: 12px; }
+  .teacher-controls h2 { display: none; }
+  .teacher-controls p { margin-top: 0; }
+}
+@media (max-width: 560px) {
+  main.student-view, .teacher-home, .teacher-session { padding: 16px; padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+  header { gap: 12px; }
+  .student-view .wordmark span { display: none; }
+  .student-view header { flex-direction: row; flex-wrap: wrap; align-items: center; padding-bottom: 16px; }
+  .student-view .header-tools { width: auto; flex: 1; justify-content: flex-end; }
+  .student-view .header-tools > a { display: none; }
+  .student-view .theme-selector { gap: 4px; }
+  .student-view section, .student-view form { padding: 20px; margin-top: 16px; }
+  .student-view .session-grid > section { margin-top: 0; }
+  .student-view h1 { margin-top: 16px; }
+  .student-view p { line-height: 1.5; }
+  .student-view footer { margin-top: 24px; }
+  .student-view .roomCode { font-size: 2.5rem; }
+  .sign-out { float: none; margin: 0 0 16px; }
+  .preview-heading { flex-direction: column; }
+  .preview-heading button { width: 100%; }
+  .teacher-session .options { grid-template-columns: 1fr; }
+  .preparation-grid > section { padding: 20px; }
+}
+@media (min-width: 901px) {
+  .teacher-home.signed-in header { padding-bottom: 12px; }
+  .teacher-home.signed-in h1 { font-size: 2rem; margin: 4px 0; }
+  .teacher-home.signed-in h1 + p { margin: 4px 0 12px; }
+  .lesson-setup h2 { font-size: 1.4rem; margin-bottom: 16px; }
+  .lesson-setup label { margin-bottom: 12px; font-size: .9rem; }
+  .lesson-setup .github-import { margin: 12px 0; padding-bottom: 12px; }
+  .lesson-setup .github-import h3 { margin-top: 8px; }
+  .preview-steps { max-height: 43vh; }
+}
+
+.lesson-video { margin-top: 16px; min-width: 0; }
+.lesson-video video { display: block; width: 100%; max-height: 65vh; background: #000; border-radius: 8px; }
+.lesson-video > a { display: inline-block; margin-top: 8px; font-size: .9rem; }
+.lesson-video iframe { display: block; width: 100%; aspect-ratio: 16 / 9; min-height: 200px; border: 0; border-radius: 8px; background: #000; }
