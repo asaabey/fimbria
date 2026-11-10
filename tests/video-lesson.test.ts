@@ -82,3 +82,35 @@ describe('lesson format guide',()=>{
     for(const block of lessons)expect(()=>parseLesson(JSON.parse(block))).not.toThrow();
   });
 });
+
+describe('step tables',()=>{
+  const table={caption:'Results',columns:['Test','Result'],rowHeaders:true,rows:[['Potassium','6.8 mmol/L'],['Creatinine',212]]};
+  const slide={id:'s',type:'slide',title:'Results',body:'',table};
+  it('accepts tables on slides and questions, with or without a header row, and passes them to the live step',()=>{
+    const headerless={rows:[['a','b'],['c','d']]};
+    const question={...fixture.steps[2],table:headerless};
+    const parsed=parseLesson({...fixture,steps:[slide,question]});
+    expect(parsed.steps[0]).toEqual(slide);
+    const store=new Store(':memory:');
+    try{
+      const room=store.create(store.lesson(parsed));
+      store.action(room,'START');expect(store.snapshot(room).step).toMatchObject({table});
+      store.action(room,'NEXT');expect(store.snapshot(room).step).toMatchObject({table:headerless});
+    }finally{store.db.close();}
+  });
+  it('rejects ragged rows, oversize tables, unknown fields and tables on video steps',()=>{
+    expect(()=>parseLesson({...fixture,steps:[{...slide,table:{...table,rows:[['Potassium']]}}]})).toThrow('must have 2 cells');
+    expect(()=>parseLesson({...fixture,steps:[{...slide,table:{rows:[['a','b'],['c']]}}]})).toThrow('first row');
+    expect(()=>parseLesson({...fixture,steps:[{...slide,table:{...table,columns:Array(9).fill('c'),rows:[Array(9).fill('x')]}}]})).toThrow();
+    expect(()=>parseLesson({...fixture,steps:[{...slide,table:{...table,rows:Array(31).fill(['a','b'])}}]})).toThrow();
+    expect(()=>parseLesson({...fixture,steps:[{...slide,table:{...table,rows:[]}}]})).toThrow();
+    expect(()=>parseLesson({...fixture,steps:[{...slide,table:{...table,rows:[['a',{b:1}]]}}]})).toThrow();
+    expect(()=>parseLesson({...fixture,steps:[{...slide,table:{...table,rows:[['a','x'.repeat(201)]]}}]})).toThrow();
+    expect(()=>parseLesson({...fixture,steps:[{...slide,table:{...table,align:'left'}}]})).toThrow();
+    expect(()=>parseLesson({...fixture,steps:[{...video,table}]})).toThrow();
+  });
+  it('validates the bundled table example',async()=>{
+    const example=(await import('../examples/tables.json',{with:{type:'json'}})).default;
+    expect(parseLesson(example).steps.every(s=>s.type!=='video'&&s.table)).toBe(true);
+  });
+});

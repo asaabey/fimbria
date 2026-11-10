@@ -220,3 +220,28 @@ li p { margin: 6px 0; }
   .presentation .lesson-image img, .teacher-session .lesson-image img { max-height: 70vh; }
 }
 .format-help { font-size: .85rem; line-height: 1.5; margin: -4px 0 16px; }
+
+/* Step tables: plain data tables; wide ones scroll inside their own box. */
+.lesson-table { margin: 4px 0 24px; overflow-x: auto; max-width: 100%; border: 1px solid var(--border); border-radius: 8px; }
+/* Edge shadows appear only while there is more table to scroll to. */
+.lesson-table { background:
+  linear-gradient(to right, var(--surface) 30%, transparent) left / 32px 100% no-repeat local,
+  linear-gradient(to left, var(--surface) 30%, transparent) right / 32px 100% no-repeat local,
+  radial-gradient(farthest-side at 0 50%, #0000002e, transparent) left / 12px 100% no-repeat scroll,
+  radial-gradient(farthest-side at 100% 50%, #0000002e, transparent) right / 12px 100% no-repeat scroll; }
+.lesson-table:focus-visible { outline-offset: 2px; }
+.lesson-table table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 1rem; line-height: 1.45; }
+.lesson-table caption { caption-side: top; text-align: left; padding: 10px 14px; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--border); }
+.lesson-table th, .lesson-table td { padding: 10px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); overflow-wrap: normal; }
+.lesson-table thead th { background: var(--answer); font-weight: 600; }
+.lesson-table .nowrap { white-space: nowrap; }
+.lesson-table tbody th { font-weight: 600; }
+.lesson-table tbody tr:last-child > * { border-bottom: 0; }
+.lesson-table.compact { margin: 8px 0; }
+.lesson-table.compact table { font-size: .85rem; }
+.lesson-table.compact th, .lesson-table.compact td { padding: 6px 10px; }
+.presentation .lesson-table table { font-size: 1.15rem; }
+@media (max-width: 560px) {
+  .lesson-table th, .lesson-table td { padding: 8px 10px; }
+  .lesson-table table { font-size: .95rem; }
+}

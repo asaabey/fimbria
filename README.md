@@ -133,6 +133,25 @@ Slides and questions accept an optional `image`. On the presentation display and
 
 Video steps do not take an image. Landscape images such as rhythm strips appear short in the one-third column, while portrait images such as chest X-rays use it best. See `examples/images.json` for a complete lesson.
 
+## Add tables to slides and questions
+
+Slides and questions accept an optional `table`, for lab results, reference ranges or comparisons. On a slide it appears under the body; on a question it appears between the prompt and the options.
+
+```json
+"table": {
+  "caption": "Results today",
+  "columns": ["Test", "Result", "Previous (3 months)"],
+  "rowHeaders": true,
+  "rows": [["Potassium", "6.8 mmol/L", "4.9 mmol/L"], ["Creatinine", "212 µmol/L", "118 µmol/L"]]
+}
+```
+
+- `rows` (required): 1-30 rows of 1-8 cells. Each cell is a string of up to 200 characters, or a number. Every row must be as long as `columns`, or as the first row if there are no `columns`.
+- `columns` (optional): header labels. `rowHeaders: true` makes the first cell of each row a row header. `caption` (optional) appears above the table.
+- On phones, a table wider than the screen scrolls inside its own box, and an edge shadow shows there is more. Short values such as "6.8 mmol/L" never break across lines.
+
+A question's table is visible before the vote, so it must not contain the answer. See `examples/tables.json`.
+
 ## Embed MP4 and YouTube videos
 
 Put your MP4 files in `public/media/` (for example, `public/media/gradient.mp4`). Vite serves them at `/media/gradient.mp4` during development and copies them into production builds. Rebuild/redeploy after adding files. These are public static assets; SQLite backups do not include them, so keep the originals separately.

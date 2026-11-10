@@ -74,6 +74,7 @@ Every step needs an `id` (1-100 characters, **unique within the lesson**) and a 
 | `title` | yes | 1-200 characters |
 | `body` | yes | 0-10,000 characters of plain text; line breaks are kept |
 | `image` | no | See [Images](#images) |
+| `table` | no | See [Tables](#tables). Shown under the body |
 
 ### `question`: single-answer multiple choice
 
@@ -99,6 +100,7 @@ Every step needs an `id` (1-100 characters, **unique within the lesson**) and a 
 | `correctOptionId` | yes | Must equal one option's `id`. Exactly one correct answer |
 | `explanation` | yes | 0-10,000 characters, shown only after the reveal |
 | `image` | no | See [Images](#images) |
+| `table` | no | See [Tables](#tables). Shown between the prompt and the options, visible before the reveal |
 
 Options are shown in the order given and labelled A, B, C... Do not write
 the letters into `text`.
@@ -115,7 +117,7 @@ the letters into `text`.
 | `src` | yes | An MP4 (site path or HTTPS) or a YouTube link to a single video: `youtube.com/watch?v=`, `youtu.be/`, `/shorts/`, `/live/` or `/embed/`. Start times (`t=90`, `t=1m30s`, `start=90`) are kept |
 | `captionsSrc` | no | English WebVTT (`.vtt`) captions, **MP4 only**. YouTube videos use YouTube's own captions |
 
-Video steps cannot have an `image`. Each screen plays the video
+Video steps cannot have an `image` or a `table`. Each screen plays the video
 independently; playback is not synchronised.
 
 ## Images
@@ -145,6 +147,41 @@ space best; wide images such as rhythm strips appear short.
 what is visible ("tall, narrow, peaked T waves"), not the diagnosis the question
 asks for.
 
+## Tables
+
+Slides and questions accept one optional table, which is useful for lab
+results, reference ranges and comparisons:
+
+```json
+"table": {
+  "caption": "Results today",
+  "columns": ["Test", "Result", "Previous (3 months)"],
+  "rowHeaders": true,
+  "rows": [
+    ["Potassium", "6.8 mmol/L", "4.9 mmol/L"],
+    ["Creatinine", "212 µmol/L", "118 µmol/L"]
+  ]
+}
+```
+
+| Field | Required | Rules |
+|-------|----------|-------|
+| `rows` | yes | 1-30 rows. Each row is an array of 1-8 cells; a cell is a string (up to 200 characters) or a number |
+| `columns` | no | 1-8 header labels (each up to 200 characters). Leave it out for a table without a header row |
+| `rowHeaders` | no | `true` makes the first cell of each row a row header, as in a test-name/result table. Default `false` |
+| `caption` | no | 1-300 characters, shown above the table and used as its accessible name |
+
+Every row must have the same number of cells: the number of `columns` if
+given, otherwise the length of the first row. Cells are plain text. To keep
+units next to their numbers, write the cell as a string (`"6.8 mmol/L"`).
+
+Tables appear in the main text column. On the projector they sit beside any
+image. On phones, a table wider than the screen scrolls sideways inside its
+own box, so keep tables to 2-4 short columns where you can.
+
+**On a question, the table is visible before the vote.** Never put the answer
+in it.
+
 ## Links
 
 Every `src` and `captionsSrc` must be one of:
@@ -168,12 +205,13 @@ Fimbria checks these after the JSON Schema passes:
 
 1. Step `id`s are unique across the lesson.
 2. Option `id`s are unique within each question.
-3. `correctOptionId` matches one of that question's option `id`s.
-4. Every `src` and `captionsSrc` follows [Links](#links).
-5. YouTube `src` links point to exactly one video (an 11-character video ID).
+3. Every table row has the same number of cells as `columns` (or as the first row when there are no `columns`).
+4. `correctOptionId` matches one of that question's option `id`s.
+5. Every `src` and `captionsSrc` follows [Links](#links).
+6. YouTube `src` links point to exactly one video (an 11-character video ID).
    Playlists and channel pages are rejected.
-6. `captionsSrc` is not used with YouTube videos.
-7. The whole file is under **256 KB**.
+7. `captionsSrc` is not used with YouTube videos.
+8. The whole file is under **256 KB**.
 
 ## Delivering a lesson
 
@@ -198,6 +236,9 @@ Fimbria checks these after the JSON Schema passes:
   tempting wrong answer is wrong. This is the teaching moment.
 - **Readability.** Slide bodies are read from a projector, so keep them to a
   few short lines rather than paragraphs.
+- **Tables.** Use a table for structured data such as results, ranges or
+  comparisons, rather than spelling it out in prose. Put units in the column
+  header or the cell.
 - **Images.** Use one image per step, only when it carries information.
   Write accurate `alt` text, and don't reveal the answer in `alt` or `caption`.
 - **Stable IDs.** Use short, meaningful IDs (`q-hyperk-ecg`), not random strings.
@@ -232,6 +273,12 @@ Fimbria checks these after the JSON Schema passes:
       "image": {
         "src": "/media/sample-ecg-strip.svg",
         "alt": "Lead II rhythm strip, regular rhythm, with tall, narrow, peaked T waves"
+      },
+      "table": {
+        "caption": "Observations",
+        "columns": ["Measure", "Value"],
+        "rowHeaders": true,
+        "rows": [["Heart rate", "84 /min"], ["Blood pressure", "128/76 mmHg"]]
       },
       "options": [
         { "id": "hyperk", "text": "Hyperkalaemia" },

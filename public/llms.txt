@@ -1,6 +1,6 @@
 # Fimbria
 
-> Fimbria is a live teaching app. A teacher presents a lesson step by step while up to 40 students answer multiple-choice questions on their phones. A lesson is one JSON file (slides, single-answer questions, videos, optional images) that the teacher uploads or imports from a public GitHub link.
+> Fimbria is a live teaching app. A teacher presents a lesson step by step while up to 40 students answer multiple-choice questions on their phones. A lesson is one JSON file (slides, single-answer questions, videos, optional images and tables) that the teacher uploads or imports from a public GitHub link.
 
 If you are writing lesson content, read the format guide first, then validate against the schema.
 

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "table-lesson",
+  "title": "Interpreting electrolytes",
+  "steps": [
+    {
+      "id": "ranges",
+      "type": "slide",
+      "title": "Reference ranges",
+      "body": "Keep these adult ranges in mind. Local laboratory ranges vary.",
+      "table": {
+        "caption": "Adult serum reference ranges",
+        "columns": ["Analyte", "Range", "Units"],
+        "rows": [
+          ["Sodium", "135–145", "mmol/L"],
+          ["Potassium", "3.5–5.2", "mmol/L"],
+          ["Bicarbonate", "22–32", "mmol/L"],
+          ["Creatinine", "45–90", "µmol/L"]
+        ]
+      }
+    },
+    {
+      "id": "q-results",
+      "type": "question",
+      "prompt": "A 68-year-old on an ACE inhibitor has these results. What is the most urgent next step?",
+      "table": {
+        "caption": "Results today",
+        "columns": ["Test", "Result", "Previous (3 months)"],
+        "rowHeaders": true,
+        "rows": [
+          ["Potassium", "6.8 mmol/L", "4.9 mmol/L"],
+          ["Creatinine", "212 µmol/L", "118 µmol/L"],
+          ["Bicarbonate", "17 mmol/L", "24 mmol/L"]
+        ]
+      },
+      "options": [
+        {"id": "ecg", "text": "Perform a 12-lead ECG now"},
+        {"id": "repeat", "text": "Repeat the potassium next week"},
+        {"id": "diet", "text": "Give low-potassium dietary advice"},
+        {"id": "renal-us", "text": "Arrange a renal ultrasound"}
+      ],
+      "correctOptionId": "ecg",
+      "explanation": "Potassium of 6.8 mmol/L with acute kidney injury needs an ECG immediately to look for cardiac effects, alongside urgent treatment.\nThe other steps may follow, but none is urgent."
+    }
+  ]
+}
