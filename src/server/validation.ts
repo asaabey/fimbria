@@ -28,6 +28,7 @@ export function parseLesson(input:unknown):Lesson {
       }
       if(step.captionsSrc)validateMediaUrl(step.captionsSrc,`/steps/${i}/captionsSrc`);
     }
+    if(step.type!=='video'&&step.image)validateMediaUrl(step.image.src,`/steps/${i}/image/src`);
     if(step.type==='question'){
       if(new Set(step.options.map(o=>o.id)).size!==step.options.length) throw new Error(`/steps/${i}/options IDs must be unique`);
       if(!step.options.some(o=>o.id===step.correctOptionId)) throw new Error(`/steps/${i}/correctOptionId must reference an option`);

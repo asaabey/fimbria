@@ -202,3 +202,21 @@ li p { margin: 6px 0; }
 .lesson-video video { display: block; width: 100%; max-height: 65vh; background: #000; border-radius: 8px; }
 .lesson-video > a { display: inline-block; margin-top: 8px; font-size: .9rem; }
 .lesson-video iframe { display: block; width: 100%; aspect-ratio: 16 / 9; min-height: 200px; border: 0; border-radius: 8px; background: #000; }
+
+/* Step images: on top on phones and narrow screens; right third on the projector and teacher view. */
+.lesson-image { margin: 0 0 20px; min-width: 0; }
+.lesson-image a { display: block; border-radius: 8px; }
+.lesson-image img { display: block; width: 100%; max-height: 40vh; object-fit: contain; border-radius: 8px; background: var(--answer); }
+.lesson-image figcaption { margin-top: 8px; font-size: .85rem; line-height: 1.5; color: var(--muted); }
+.lesson-image .image-error { margin: 0; padding: 16px; border: 1px dashed var(--border); border-radius: 8px; color: var(--muted); }
+.lesson-image.compact { margin: 8px 0; }
+.lesson-image.compact img { width: auto; max-width: min(240px, 100%); max-height: 120px; }
+.step-main { min-width: 0; }
+@media (min-width: 901px) {
+  main.presentation { max-width: 1280px; }
+  .presentation .step-layout.has-image, .teacher-session .step-layout.has-image { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+  .step-layout.has-image > .step-main { grid-column: 1; grid-row: 1; }
+  .presentation .step-layout.has-image > .lesson-image, .teacher-session .step-layout.has-image > .lesson-image { grid-column: 2; grid-row: 1; margin: 0; position: sticky; top: 24px; }
+  .presentation .lesson-image img, .teacher-session .lesson-image img { max-height: 70vh; }
+}
+.format-help { font-size: .85rem; line-height: 1.5; margin: -4px 0 16px; }

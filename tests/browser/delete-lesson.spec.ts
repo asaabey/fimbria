@@ -28,3 +28,19 @@ test('teacher deletes a saved lesson after confirming',async({page})=>{
 test('deleting a lesson requires a teacher login',async({request})=>{
   expect((await request.delete('/api/lessons/anything')).status()).toBe(401);
 });
+test('lesson format guide, agent index and schema are public',async({request,page})=>{
+  const schema=await request.get('/lesson.schema.json');
+  expect(schema.status()).toBe(200);
+  expect(schema.headers()['content-type']).toContain('application/schema+json');
+  expect((await schema.json()).properties.schemaVersion.const).toBe(1);
+  const guide=await request.get('/docs/lesson-format.md');
+  expect(guide.status()).toBe(200);
+  expect(await guide.text()).toContain('# Fimbria lesson format');
+  const index=await request.get('/llms.txt');
+  expect(await index.text()).toContain('/docs/lesson-format.md');
+  await page.goto('/');
+  await page.getByLabel('Password').fill('browser-test-password');
+  await page.getByRole('button',{name:'Sign in',exact:true}).click();
+  await expect(page.getByRole('link',{name:'lesson format guide'})).toHaveAttribute('href','/docs/lesson-format.md');
+  await expect(page.getByRole('link',{name:'JSON schema'})).toHaveAttribute('href','/lesson.schema.json');
+});

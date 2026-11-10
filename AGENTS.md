@@ -39,3 +39,7 @@ The implementation follows PLAN.md where it extends the original PRD (40 partici
 Use npm ci, npm run dev, npm run build, npm run lint (TypeScript strict checking), npm test, npm run test:browser and npm run test:classroom. See README.md for required account setup and simulator credentials. Use two-space indentation, semicolons, camelCase variables, PascalCase components, snake_case events and uppercase session phases.
 
 Video lesson steps use `type: 'video'`, `title`, `src` (MP4 or YouTube link) and optional English WebVTT `captionsSrc` for MP4s. `src/shared/video.ts` validates and normalizes supported YouTube URLs for embedding. `public/media` holds static media copied into production builds; `src/client/VideoPlayer.tsx` renders the shared player. Playback is independent per screen, with no new socket events.
+
+Slides and questions take an optional `image` object (`src` site path or HTTPS, required `alt`, optional `caption`), validated with the same URL rules as video. `src/client/LessonImage.tsx` renders it. `.step-layout.has-image` puts it in the right third on `.presentation`/`.teacher-session` above 900 px and above the content elsewhere. No new socket events.
+
+The public authoring docs are `public/llms.txt` and `public/docs/lesson-format.md`, and the server serves `/lesson.schema.json`. Update the guide in the same change as any schema change; `tests/video-lesson.test.ts` enforces that every schema field is documented and that the guide's full example validates.

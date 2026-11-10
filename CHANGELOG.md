@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Public lesson-format docs for authors and AI agents: `/llms.txt`, `/docs/lesson-format.md` and the canonical `/lesson.schema.json`, linked from the teacher page.
+- Optional `image` (`src`, `alt`, `caption`) on slides and questions: right third on the presentation and teacher views, above the content on phones, with tap-to-enlarge, preview thumbnails and a text fallback. Includes `examples/images.json`.
 - Teachers can delete saved lessons from the preview panel after an inline confirmation (`DELETE /api/lessons/:id`). Sessions already started keep their own copy.
 - YouTube video links in lesson steps, including watch/share/Shorts/live/embed URLs and start times.
 - Embedded MP4 lesson steps with responsive playback controls, optional captions, media error feedback and a sample video lesson.

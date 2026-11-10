@@ -36,3 +36,49 @@ describe('video lessons',()=>{
     } finally {store.db.close();}
   });
 });
+
+describe('step images',()=>{
+  const image={src:'/media/sample-ecg-strip.svg',alt:'Rhythm strip with peaked T waves',caption:'Lead II'};
+  const slide={id:'s',type:'slide',title:'Look',body:'Study the strip.',image};
+  const question={...fixture.steps[2],image:{src:'https://cdn.example.com/strip.png',alt:'Strip'}};
+  it('accepts images on slides and questions and passes them through to the live step',()=>{
+    const parsed=parseLesson({...fixture,steps:[slide,question]});
+    expect(parsed.steps[0]).toEqual(slide);
+    const store=new Store(':memory:');
+    try{
+      const room=store.create(store.lesson(parsed));
+      store.action(room,'START');expect(store.snapshot(room).step).toEqual(slide);
+      store.action(room,'NEXT');expect(store.snapshot(room).step).toMatchObject({image:question.image});
+      expect(store.snapshot(room).step).not.toHaveProperty('correctOptionId');
+    }finally{store.db.close();}
+  });
+  it('rejects unsafe sources, missing alt text, unknown fields and images on video steps',()=>{
+    for(const src of ['javascript:alert(1)','data:image/png;base64,abc','//example.com/a.png','http://example.com/a.png','relative.png','']){
+      expect(()=>parseLesson({...fixture,steps:[{...slide,image:{...image,src}}]})).toThrow();
+    }
+    const {alt,...noAlt}=image;
+    expect(()=>parseLesson({...fixture,steps:[{...slide,image:noAlt}]})).toThrow();
+    expect(()=>parseLesson({...fixture,steps:[{...slide,image:{...image,alt:''}}]})).toThrow();
+    expect(()=>parseLesson({...fixture,steps:[{...slide,image:{...image,width:300}}]})).toThrow();
+    expect(()=>parseLesson({...fixture,steps:[{...video,image}]})).toThrow();
+  });
+  it('validates the bundled image example',async()=>{
+    const example=(await import('../examples/images.json',{with:{type:'json'}})).default;
+    expect(parseLesson(example).steps.every(s=>s.type!=='video'&&s.image)).toBe(true);
+  });
+});
+
+describe('lesson format guide',()=>{
+  it('documents every schema field and its complete examples are valid lessons',async()=>{
+    const {readFile}=await import('node:fs/promises');
+    const guide=await readFile('public/docs/lesson-format.md','utf8');
+    const schema=JSON.parse(await readFile('schemas/lesson.schema.json','utf8'));
+    const fields=new Set<string>();
+    const walk=(node:any)=>{if(node&&typeof node==='object'){if(node.properties)for(const k of Object.keys(node.properties))fields.add(k);Object.values(node).forEach(walk);}};
+    walk(schema);
+    for(const field of fields)expect(guide,`guide should mention "${field}"`).toContain(`\`${field}\``);
+    const lessons=[...guide.matchAll(/```json\n([\s\S]*?)```/g)].map(m=>m[1]).filter(block=>block.includes('"schemaVersion": 1')&&!block.includes('/*'));
+    expect(lessons.length).toBeGreaterThan(0);
+    for(const block of lessons)expect(()=>parseLesson(JSON.parse(block))).not.toThrow();
+  });
+});

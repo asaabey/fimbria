@@ -6,6 +6,7 @@ import {Store} from './store.js';
 import {parseLesson} from './validation.js';
 import {importGithubLesson} from './github-import.js';
 import {checkPassword} from './auth.js';
+import lessonSchema from '../../schemas/lesson.schema.json' with {type:'json'};
 const port=Number(process.env.PORT||3000);
 const publicOrigin=new URL(process.env.PUBLIC_BASE_URL||`http://localhost:${port}`).origin;
 const store=new Store(process.env.DB_PATH||'data/app.sqlite',process.env.PUBLIC_BASE_URL||`http://localhost:${port}`);
@@ -19,6 +20,8 @@ app.use((req,res,next)=>{
   next();
 });
 app.get('/api/health',(_req,res)=>res.json({ok:true}));
+// Public, canonical lesson schema for authors and agents (see public/docs/lesson-format.md).
+app.get('/lesson.schema.json',(_req,res)=>{res.set('Cache-Control','public, max-age=300');res.type('application/schema+json').json(lessonSchema);});
 const attempts=new Map<string,{n:number;until:number}>();
 app.post('/api/login',(req,res)=>{
   const key=req.ip||'local',now=Date.now();

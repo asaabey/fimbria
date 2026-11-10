@@ -97,6 +97,42 @@ The header theme selector offers System, Light, Dark and Paper appearances, reme
 
 To run browser tests while a local application already uses port 3000, choose another test port: `TEST_PORT=3002 npm run test:browser`. The test server uses its own database and does not change the live teacher account.
 
+## Lesson format for authors and agents
+
+The site publishes the lesson format for anyone writing content, including AI agents:
+
+- `/llms.txt`: a short index for agents that points to the files below.
+- `/docs/lesson-format.md`: the full guide, covering every field and limit, the rules beyond the schema, how lessons behave in class, writing guidance and a complete example. The source is `public/docs/lesson-format.md`.
+- `/lesson.schema.json`: the canonical JSON Schema, served from `schemas/lesson.schema.json`.
+
+The teacher page links the guide and the schema under "Prepare your lesson". A unit test fails if a schema field is missing from the guide or the guide's complete example stops validating, so update the guide whenever the schema changes.
+
+## Add images to slides and questions
+
+Slides and questions accept an optional `image`. On the presentation display and the teacher view (screens wider than 900 px), the image takes the right third and the text the left two-thirds. On phones and narrow screens it sits above the title or question. Tapping the image opens it full size. The lesson preview shows a thumbnail.
+
+```json
+{
+  "id": "strip-question",
+  "type": "question",
+  "prompt": "Which electrolyte abnormality best explains these T waves?",
+  "image": {
+    "src": "/media/sample-ecg-strip.svg",
+    "alt": "Lead II rhythm strip with tall, narrow, peaked T waves",
+    "caption": "Optional caption"
+  },
+  "options": [{"id": "a", "text": "Hyperkalaemia"}, {"id": "b", "text": "Hypokalaemia"}],
+  "correctOptionId": "a",
+  "explanation": "..."
+}
+```
+
+- `src` (required): a site path such as `/media/xray.jpg` (put the file in `public/media/` and redeploy) or an `https://` URL. Any format the browser can show works: JPG, PNG, WebP, SVG or GIF.
+- `alt` (required, up to 500 characters): describes the image for screen readers. It is also shown in place of the image if the image fails to load.
+- `caption` (optional, up to 300 characters): shown under the image.
+
+Video steps do not take an image. Landscape images such as rhythm strips appear short in the one-third column, while portrait images such as chest X-rays use it best. See `examples/images.json` for a complete lesson.
+
 ## Embed MP4 and YouTube videos
 
 Put your MP4 files in `public/media/` (for example, `public/media/gradient.mp4`). Vite serves them at `/media/gradient.mp4` during development and copies them into production builds. Rebuild/redeploy after adding files. These are public static assets; SQLite backups do not include them, so keep the originals separately.

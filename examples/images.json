@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "image-lesson",
+  "title": "Reading a rhythm strip",
+  "steps": [
+    {
+      "id": "strip-intro",
+      "type": "slide",
+      "title": "Look before you label",
+      "body": "Study the strip. Describe the rate and rhythm first, then look closely at each wave.",
+      "image": {
+        "src": "/media/sample-ecg-strip.svg",
+        "alt": "Lead II rhythm strip, regular rhythm, with tall, narrow, peaked T waves",
+        "caption": "Sample strip (illustrative drawing)"
+      }
+    },
+    {
+      "id": "strip-question",
+      "type": "question",
+      "prompt": "Which electrolyte abnormality best explains these T waves?",
+      "image": {
+        "src": "/media/sample-ecg-strip.svg",
+        "alt": "Lead II rhythm strip, regular rhythm, with tall, narrow, peaked T waves"
+      },
+      "options": [
+        {"id": "hyperk", "text": "Hyperkalaemia"},
+        {"id": "hypok", "text": "Hypokalaemia"},
+        {"id": "hypoca", "text": "Hypocalcaemia"},
+        {"id": "hypermg", "text": "Hypermagnesaemia"}
+      ],
+      "correctOptionId": "hyperk",
+      "explanation": "Tall, narrow, peaked T waves are an early ECG sign of hyperkalaemia. Check the potassium urgently and treat according to local protocol."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+# Fimbria
+
+> Fimbria is a live teaching app. A teacher presents a lesson step by step while up to 40 students answer multiple-choice questions on their phones. A lesson is one JSON file (slides, single-answer questions, videos, optional images) that the teacher uploads or imports from a public GitHub link.
+
+If you are writing lesson content, read the format guide first, then validate against the schema.
+
+## Lesson authoring
+
+- [Lesson format guide](/docs/lesson-format.md): every field and limit, the rules the schema cannot express, how lessons behave in class, writing guidance and a complete example
+- [Lesson JSON Schema](/lesson.schema.json): JSON Schema draft-07, the source of truth for structure and limits
+
+## Notes
+
+- Fimbria has no public API for creating lessons. Deliver a JSON file to the teacher, or put it in a public GitHub repository and give them the link.
+- Students join at /join with a six-digit room code; nothing there is meant for agents.
