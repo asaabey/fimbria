@@ -117,6 +117,12 @@ li p { margin: 6px 0; }
 .preview-heading h2 { font-size: 1.5rem; margin-bottom: 8px; }
 .preview-heading p { margin: 0; font-size: .85rem; }
 .preview-heading button { flex-shrink: 0; }
+.preview-actions { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+.secondary.danger { color: var(--error-text); border-color: var(--error-border); }
+.danger-solid { background: var(--error-text); color: var(--surface); border-color: var(--error-text); }
+.delete-confirm { margin: 16px 0 0; padding: 16px; background: var(--error-background); color: var(--error-text); border: 1px solid var(--error-border); }
+.delete-confirm p { margin: 0 0 12px; }
+.delete-confirm div { display: flex; gap: 8px; flex-wrap: wrap; }
 .preview-steps { overflow-y: auto; max-height: 48vh; margin-bottom: 0; padding-left: 28px; scrollbar-gutter: stable; }
 .preview-steps li { border-bottom: 1px solid var(--border); padding: 12px 8px; }
 .preview-steps p { font-size: .9rem; line-height: 1.5; }
@@ -177,6 +183,7 @@ li p { margin: 6px 0; }
   .sign-out { float: none; margin: 0 0 16px; }
   .preview-heading { flex-direction: column; }
   .preview-heading button { width: 100%; }
+  .preview-actions { width: 100%; }
   .teacher-session .options { grid-template-columns: 1fr; }
   .preparation-grid > section { padding: 20px; }
 }

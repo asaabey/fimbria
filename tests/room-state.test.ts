@@ -53,4 +53,17 @@ describe('durable rooms',()=>{
       store.action(room,'END');expect(()=>store.join(store.snapshot(room).code)).toThrow('ended');
     }finally{store.db.close();rmSync(dir,{recursive:true});}
   });
+  it('deletes a saved lesson without affecting sessions started from it',()=>{
+    const dir=mkdtempSync(join(tmpdir(),'delete-')),store=new Store(join(dir,'test.sqlite'));
+    try{
+      const lesson=store.lesson(parseLesson(fixture)),keep=store.lesson(parseLesson(fixture)),room=store.create(lesson);
+      store.action(room,'START');
+      store.deleteLesson(lesson);
+      expect(store.db.prepare('SELECT id FROM lessons').all().map(r=>r.id)).toEqual([keep]);
+      expect(()=>store.create(lesson)).toThrow('Lesson not found');
+      expect(()=>store.deleteLesson(lesson)).toThrow('Lesson not found');
+      store.action(room,'NEXT');
+      expect(store.snapshot(room)).toMatchObject({title:fixture.title,index:1,phase:'ACTIVE'});
+    }finally{store.db.close();rmSync(dir,{recursive:true});}
+  });
 });

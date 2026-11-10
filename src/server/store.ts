@@ -17,6 +17,8 @@ export class Store {
       CREATE TABLE IF NOT EXISTS answers(room TEXT NOT NULL, participant TEXT NOT NULL, question TEXT NOT NULL, option TEXT NOT NULL, PRIMARY KEY(room,participant,question));`);
   }
   lesson(input:Lesson){const id=randomUUID();this.db.prepare('INSERT INTO lessons VALUES (?,?)').run(id,JSON.stringify(input));return id;}
+  // Rooms keep their own copy of the lesson body, so deleting a saved lesson never affects sessions.
+  deleteLesson(id:string){if(!this.db.prepare('DELETE FROM lessons WHERE id=?').run(id).changes)throw new Error('Lesson not found');}
   room(id:string):any {const row=this.db.prepare('SELECT * FROM rooms WHERE id=? OR code=?').get(id,id);if(!row)throw new Error('Room not found');return row;}
   create(lessonId:string){
     const lesson=this.db.prepare('SELECT body FROM lessons WHERE id=?').get(lessonId);

@@ -45,6 +45,7 @@ app.post('/api/lessons/import',async(req,res)=>{
     res.status(400).json({error:(error as Error).message});
   }
 });
+app.delete('/api/lessons/:id',(req,res)=>{try{store.deleteLesson(req.params.id);res.json({ok:true});}catch(e){res.status(404).json({error:(e as Error).message});}});
 app.post('/api/rooms',(req,res)=>{try{res.json({id:store.create(req.body.lessonId)});}catch(e){res.status(400).json({error:(e as Error).message});}});
 function broadcast(id:string){for(const socket of io.sockets.sockets.values())if(socket.data.room===id)socket.emit('room_state_update',store.snapshot(id,socket.data.teacher,socket.data.credential));}
 io.on('connection',socket=>{

@@ -1,0 +1,30 @@
+import {test,expect} from '@playwright/test';
+import fixture from '../../examples/intro.json' with {type:'json'};
+test('teacher deletes a saved lesson after confirming',async({page})=>{
+  await page.goto('/');
+  await page.getByLabel('Password').fill('browser-test-password');await page.getByRole('button',{name:'Sign in',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeVisible();
+  expect((await page.request.delete('/api/lessons/missing-id')).status()).toBe(404);
+  const title=`Delete me ${Date.now()}`;
+  const saved=await (await page.request.post('/api/lessons',{data:{...fixture,title}})).json();
+  await page.reload();
+  const lessons=page.getByLabel('Saved lessons');
+  await lessons.selectOption(saved.id);
+  await page.getByRole('button',{name:'Delete lesson',exact:true}).click();
+  const confirm=page.getByRole('group',{name:'Confirm lesson deletion'});
+  await expect(confirm).toContainText(title);
+  await page.screenshot({path:'test-results/delete-lesson-confirm.png',fullPage:true});
+  await confirm.getByRole('button',{name:'Cancel',exact:true}).click();
+  await expect(confirm).toBeHidden();
+  await expect(lessons).toHaveValue(saved.id);
+  await page.getByRole('button',{name:'Delete lesson',exact:true}).click();
+  await confirm.getByRole('button',{name:'Delete',exact:true}).click();
+  await expect(lessons).toHaveValue('');
+  await expect(lessons.locator('option',{hasText:title})).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'Your lesson at a glance'})).toBeVisible();
+  const remaining=await (await page.request.get('/api/lessons')).json();
+  expect(remaining.some((l:{id:string})=>l.id===saved.id)).toBe(false);
+});
+test('deleting a lesson requires a teacher login',async({request})=>{
+  expect((await request.delete('/api/lessons/anything')).status()).toBe(401);
+});

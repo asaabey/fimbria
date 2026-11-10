@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Teachers can delete saved lessons from the preview panel after an inline confirmation (`DELETE /api/lessons/:id`). Sessions already started keep their own copy.
 - YouTube video links in lesson steps, including watch/share/Shorts/live/embed URLs and start times.
 - Embedded MP4 lesson steps with responsive playback controls, optional captions, media error feedback and a sample video lesson.
 

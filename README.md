@@ -91,6 +91,8 @@ Imports require teacher login and use the same schema validation, 256 KB size li
 
 The server only downloads from raw.githubusercontent.com over HTTPS, rejects redirects, limits streamed response size, and times out after 10 seconds. The server needs outbound access to that host. API: `POST /api/lessons/import { "url": "https://github.com/..." }` returns the same `{id, lesson}` result as an upload.
 
+To remove a saved lesson, choose it, click **Delete lesson** in the preview and confirm. Deletion removes it from the saved list only: sessions already started from it keep their own copy and stay resumable. API (teacher login required): `DELETE /api/lessons/:id` returns `{ok:true}`, or 404 if the lesson does not exist.
+
 The header theme selector offers System, Light, Dark and Paper appearances, remembered per browser. Headings use a local serif font with a sans-serif interface; no font service is required.
 
 To run browser tests while a local application already uses port 3000, choose another test port: `TEST_PORT=3002 npm run test:browser`. The test server uses its own database and does not change the live teacher account.
