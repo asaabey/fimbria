@@ -45,3 +45,9 @@ Slides and questions take an optional `image` object (`src` site path or HTTPS, 
 The public authoring docs are `public/llms.txt` and `public/docs/lesson-format.md`, and the server serves `/lesson.schema.json`. Update the guide in the same change as any schema change; `tests/video-lesson.test.ts` enforces that every schema field is documented and that the guide's full example validates.
 
 Slides and questions also take an optional `table` (`rows` of string/number cells, optional `columns`, `rowHeaders`, `caption`). `parseLesson` enforces equal row lengths. `src/client/LessonTable.tsx` renders it inside a focusable scroll region.
+
+`src/client/Handout.tsx` renders the printable handout at `/handout?lesson=<id>` or `/handout?room=<id|code>` and opens the print dialog once images load; print styles live at the end of `style.css`. `Store.handout` enforces access: teachers any time, students (participant credential via `X-Participant`) only after the session ends, with their own answers and no class totals.
+
+`src/client/BodyText.tsx` renders slide bodies and explanations: `- `/`* `/`• ` lines become `<ul>`, `1. `/`1) ` lines `<ol>`, other text stays pre-wrapped prose. Use it wherever that text appears.
+
+In a room, `main` gets `in-room`: the header holds the connection badge and room code (`src/client/SessionStatus.tsx`: `PlugIcon`, `StepProgress`), and `.title-row` pairs the title with the step progress bar. Browser tests set `LOGIN_ATTEMPTS_PER_MINUTE=100`, because the suite signs in more than 10 times a minute.

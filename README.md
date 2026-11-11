@@ -34,6 +34,7 @@ Browser tests start their own server and database on port 3000; stop any local s
 - `PUBLIC_BASE_URL`: externally reachable origin, default http://localhost:3000; used for QR links and origin checks.
 - `COOKIE_SECURE`: true for HTTPS; false for local HTTP only.
 - `SESSION_TTL_HOURS`: 24; inactivity expiration checked every minute.
+- `LOGIN_ATTEMPTS_PER_MINUTE`: 10; teacher login attempts allowed per IP address per minute. The browser tests raise it because they sign in many times.
 - `TEST_BASE_URL`: simulator target, defaults to localhost.
 - `TEACHER_PASSWORD`: used only by the account setup/reset command and simulator. Minimum 12 characters.
 
@@ -151,6 +152,20 @@ Slides and questions accept an optional `table`, for lab results, reference rang
 - On phones, a table wider than the screen scrolls inside its own box, and an edge shadow shows there is more. Short values such as "6.8 mmol/L" never break across lines.
 
 A question's table is visible before the vote, so it must not contain the answer. See `examples/tables.json`.
+
+## Lists in slide text
+
+Slide bodies and explanations are plain text, but consecutive lines starting with `- `, `* ` or `• ` show as a bulleted list, and lines starting with `1. ` or `1) ` as a numbered list, everywhere the text appears (classroom screens, preview and handout). Other text keeps its line breaks. Markdown and HTML are not rendered.
+
+## Download a lesson PDF
+
+Every handout is a print-ready page at `/handout` that opens the browser's print dialog automatically; choosing **Save as PDF** saves it. The browser does the rendering, so SVG and remote images, tables and symbols such as µ come out exactly as on screen, and the server needs no PDF library.
+
+- **Teacher, saved lesson:** **Download PDF** in the lesson preview (`/handout?lesson=<id>`). Every step with correct answers and explanations.
+- **Teacher, session:** **Download lesson PDF ↗** in the session controls, at any time (`/handout?room=<room id>`). Adds each option's response count.
+- **Students:** once the teacher ends the session, the **Session complete** screen shows **Download lesson PDF** (`/handout?room=<code>`). It contains every slide and question with the answers, explanations and the student's own answers, but not class totals. Before the end the handout is refused, so nothing is spoiled.
+
+Videos appear as their title and link. API: `GET /api/handout?lesson=<id>` (teacher) or `GET /api/handout?room=<id or code>`, where a student sends the participant credential from their browser in an `X-Participant` header. A student request returns 409 until the session ends and 403 for a non-participant.
 
 ## Embed MP4 and YouTube videos
 

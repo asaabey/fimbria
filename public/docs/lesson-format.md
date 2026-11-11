@@ -28,9 +28,19 @@ What this means for authors:
   question again, but students can no longer vote.
 - **The explanation is hidden until the teacher reveals results.** Write it
   as the teaching point you want shown after the vote.
-- **Text is plain.** Markdown and HTML are not rendered: `**bold**` shows up
-  literally. Line breaks (`\n`) in a slide `body` and in an `explanation` are
-  kept.
+- **The lesson becomes a handout.** After the session ends, students can
+  download a PDF of every step with the correct answers and explanations,
+  so write explanations that still make sense when read later. Videos
+  appear as their title and link.
+- **Text is plain, with lists.** Markdown and HTML are not rendered:
+  `**bold**` shows up literally. In a slide `body` and an `explanation`, line
+  breaks (`\n`) are kept, and lists are shown as real lists:
+  - consecutive lines starting with `- `, `* ` or `• ` become a bulleted list
+  - consecutive lines starting with `1. ` or `1) ` become a numbered list,
+    counting from the first line's number
+
+  For example, `"Check:\n- Airway\n- Breathing\n- Circulation"` shows
+  "Check:" followed by three bullets. Don't add a blank line between items.
 
 ## File structure
 
@@ -72,7 +82,7 @@ Every step needs an `id` (1-100 characters, **unique within the lesson**) and a 
 | Field | Required | Rules |
 |-------|----------|-------|
 | `title` | yes | 1-200 characters |
-| `body` | yes | 0-10,000 characters of plain text; line breaks are kept |
+| `body` | yes | 0-10,000 characters of plain text; line breaks are kept and `- ` / `1. ` lines become lists |
 | `image` | no | See [Images](#images) |
 | `table` | no | See [Tables](#tables). Shown under the body |
 
@@ -235,7 +245,7 @@ Fimbria checks these after the JSON Schema passes:
 - **Explanations.** Say why the correct answer is right and why the
   tempting wrong answer is wrong. This is the teaching moment.
 - **Readability.** Slide bodies are read from a projector, so keep them to a
-  few short lines rather than paragraphs.
+  few short lines or a short `- ` list rather than paragraphs.
 - **Tables.** Use a table for structured data such as results, ranges or
   comparisons, rather than spelling it out in prose. Put units in the column
   header or the cell.

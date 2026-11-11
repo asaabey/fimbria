@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Lines starting with `- `, `* `, `• ` or `1. ` in slide bodies and explanations render as bulleted or numbered lists on every screen and in handouts.
+- Printable lesson handouts saved as PDF through the browser's print dialog: teachers from the lesson preview or the session controls (with response counts), students after the session ends (with answers, explanations and their own responses). `GET /api/handout`.
 - Optional `table` (`rows`, `columns`, `rowHeaders`, `caption`) on slides and questions, with accessible headers, scrolling on phones, preview rendering, docs and `examples/tables.json`.
 - Public lesson-format docs for authors and AI agents: `/llms.txt`, `/docs/lesson-format.md` and the canonical `/lesson.schema.json`, linked from the teacher page.
 - Optional `image` (`src`, `alt`, `caption`) on slides and questions: right third on the presentation and teacher views, above the content on phones, with tap-to-enlarge, preview thumbnails and a text fallback. Includes `examples/images.json`.
@@ -25,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Session screens use a compact top bar holding a plug connection indicator (unplugged and red while reconnecting) and the room code, with a step progress bar beside the lesson title, so the lesson starts higher on the screen.
+- Teacher login attempts per minute are configurable with `LOGIN_ATTEMPTS_PER_MINUTE` (default 10).
 - Keep teacher lesson previews and session controls alongside lesson content, and improve student layouts and answer visibility on mobile.
 
 ### Deprecated

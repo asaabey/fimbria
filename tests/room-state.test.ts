@@ -66,4 +66,24 @@ describe('durable rooms',()=>{
       expect(store.snapshot(room)).toMatchObject({title:fixture.title,index:1,phase:'ACTIVE'});
     }finally{store.db.close();rmSync(dir,{recursive:true});}
   });
+  it('gives students the handout only after the session ends, with their own answers',()=>{
+    const dir=mkdtempSync(join(tmpdir(),'handout-')),store=new Store(join(dir,'test.sqlite'));
+    try{
+      const room=store.create(store.lesson(parseLesson(fixture))),code=store.snapshot(room).code;
+      const p=store.join(code),p2=store.join(code),outsider=store.join(store.snapshot(store.create(store.lesson(parseLesson(fixture)))).code);
+      store.action(room,'START');store.action(room,'NEXT');store.action(room,'NEXT');
+      const revision=store.snapshot(room).revision;
+      store.vote(room,p.credential,'q1','a',revision);store.vote(room,p2.credential,'q1','b',revision);
+      expect(()=>store.handout(code,false,p.credential)).toThrow('once your teacher ends the session');
+      expect(store.handout(room,true)).toMatchObject({code,ended:false,totals:{q1:{a:1,b:1}}});
+      store.action(room,'END');
+      expect(()=>store.handout(code,false)).toThrow('Only participants');
+      expect(()=>store.handout(code,false,outsider.credential)).toThrow('Only participants');
+      const handout=store.handout(code,false,p.credential);
+      expect(handout).toMatchObject({code,ended:true,answers:{q1:'a'}});
+      expect(handout).not.toHaveProperty('totals');
+      expect(handout.lesson.steps).toHaveLength(fixture.steps.length);
+      expect(handout.lesson.steps[2]).toMatchObject({correctOptionId:'a',explanation:fixture.steps[2].explanation});
+    }finally{store.db.close();rmSync(dir,{recursive:true});}
+  });
 });

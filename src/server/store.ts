@@ -2,7 +2,7 @@ import {DatabaseSync} from 'node:sqlite';
 import {mkdirSync} from 'node:fs';
 import {dirname} from 'node:path';
 import {randomBytes,randomInt,randomUUID} from 'node:crypto';
-import type {Action,Lesson,Snapshot} from '../shared/contracts.js';
+import type {Action,Handout,Lesson,Snapshot} from '../shared/contracts.js';
 export class Store {
   db:DatabaseSync;
   constructor(path:string, public baseUrl='http://localhost:3000'){
@@ -78,6 +78,20 @@ export class Store {
     const totals=Object.fromEntries(rows.map(row=>[row.option,Number(row.n)]));
     const answer=token&&source?this.db.prepare('SELECT option FROM answers WHERE room=? AND participant=? AND question=?').get(r.id,token,source.id)?.option as string|undefined:undefined;
     return {id:r.id,code:r.code,title:lesson.title,phase:r.phase,revision:r.revision,index:r.idx,stepCount:lesson.steps.length,step,participants:Number(this.db.prepare('SELECT COUNT(*) AS n FROM participants WHERE room=?').get(r.id)!.n),responses:teacher?rows.reduce((n,row)=>n+Number(row.n),0):undefined,answer:answer||undefined,closed:r.phase!=='ACTIVE'||!!source&&JSON.parse(r.closed).includes(source.id),totals:revealed?totals:undefined,joinUrl:`${this.baseUrl}/join?code=${r.code}`};
+  }
+  // Students may download the full lesson (answers included) only after the session ends.
+  handout(key:string,teacher:boolean,credential?:string):Handout {
+    const r=this.room(key),lesson:Lesson=JSON.parse(r.lesson);
+    const fail=(status:number,message:string)=>Object.assign(new Error(message),{status});
+    if(!teacher){
+      if(!credential||!this.db.prepare('SELECT token FROM participants WHERE token=? AND room=?').get(credential,r.id))throw fail(403,'Only participants in this session can download its handout');
+      if(r.phase!=='ENDED')throw fail(409,'The handout is available once your teacher ends the session');
+      const rows=this.db.prepare('SELECT question,option FROM answers WHERE room=? AND participant=?').all(r.id,credential);
+      return {lesson,code:r.code,ended:true,answers:Object.fromEntries(rows.map(row=>[row.question as string,row.option as string]))};
+    }
+    const totals:Record<string,Record<string,number>>={};
+    for(const row of this.db.prepare('SELECT question,option,COUNT(*) AS n FROM answers WHERE room=? GROUP BY question,option').all(r.id))(totals[row.question as string]??={})[row.option as string]=Number(row.n);
+    return {lesson,code:r.code,ended:r.phase==='ENDED',totals};
   }
   expire(ms:number){this.db.prepare("UPDATE rooms SET phase='ENDED',revision=revision+1 WHERE phase!='ENDED' AND updated<?").run(Date.now()-ms);}
 }

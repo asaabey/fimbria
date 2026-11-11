@@ -5,7 +5,7 @@ export default defineConfig({
   testDir: 'tests/browser',
   use: {baseURL},
   webServer: {
-    command: `TEACHER_PASSWORD=browser-test-password DB_PATH=data/browser.sqlite npm run teacher && PORT=${port} PUBLIC_BASE_URL=${baseURL} DB_PATH=data/browser.sqlite npm run dev`,
+    command: `TEACHER_PASSWORD=browser-test-password DB_PATH=data/browser.sqlite npm run teacher && LOGIN_ATTEMPTS_PER_MINUTE=100 PORT=${port} PUBLIC_BASE_URL=${baseURL} DB_PATH=data/browser.sqlite npm run dev`,
     url: baseURL + '/api/health',
     reuseExistingServer: false,
   },

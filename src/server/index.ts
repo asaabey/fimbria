@@ -22,11 +22,11 @@ app.use((req,res,next)=>{
 app.get('/api/health',(_req,res)=>res.json({ok:true}));
 // Public, canonical lesson schema for authors and agents (see public/docs/lesson-format.md).
 app.get('/lesson.schema.json',(_req,res)=>{res.set('Cache-Control','public, max-age=300');res.type('application/schema+json').json(lessonSchema);});
-const attempts=new Map<string,{n:number;until:number}>();
+const attempts=new Map<string,{n:number;until:number}>(),loginLimit=Number(process.env.LOGIN_ATTEMPTS_PER_MINUTE)||10;
 app.post('/api/login',(req,res)=>{
   const key=req.ip||'local',now=Date.now();
   let rate=attempts.get(key);if(!rate||rate.until<now){rate={n:0,until:now+60000};attempts.set(key,rate);}
-  if(++rate.n>10)return void res.status(429).json({error:'Try again in one minute'});
+  if(++rate.n>loginLimit)return void res.status(429).json({error:'Try again in one minute'});
   const teacher=store.db.prepare('SELECT hash FROM teacher WHERE id=1').get();
   if(!teacher||typeof req.body.password!=='string'||!checkPassword(req.body.password,teacher.hash as string))return void res.status(401).json({error:'Invalid password'});
   const credential=randomBytes(32).toString('hex');
@@ -36,6 +36,21 @@ app.post('/api/login',(req,res)=>{
 });
 app.post('/api/logout',(req,res)=>{store.db.prepare('DELETE FROM auth WHERE token=?').run(token(req.headers.cookie));res.setHeader('Set-Cookie','teacher=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');res.json({ok:true});});
 app.get('/api/teacher',(req,res)=>res.status(authorized(req.headers.cookie)?200:401).json({ok:authorized(req.headers.cookie)}));
+// Printable handouts. A saved lesson or a running session for the teacher; an ended session for its students (X-Participant credential).
+app.get('/api/handout',(req,res)=>{
+  res.set('Cache-Control','no-store');
+  const teacher=authorized(req.headers.cookie),{lesson,room}=req.query;
+  try{
+    if(typeof lesson==='string'){
+      if(!teacher)return void res.status(401).json({error:'Teacher login required'});
+      const row=store.db.prepare('SELECT body FROM lessons WHERE id=?').get(lesson);
+      if(!row)return void res.status(404).json({error:'Lesson not found'});
+      return void res.json({lesson:JSON.parse(row.body as string)});
+    }
+    if(typeof room!=='string')return void res.status(400).json({error:'Choose a lesson or session'});
+    res.json(store.handout(room,teacher,req.get('x-participant')||undefined));
+  }catch(e){res.status((e as Error).message==='Room not found'?404:(e as {status?:number}).status||400).json({error:(e as Error).message});}
+});
 app.use('/api', (req,res,next)=>{if(!authorized(req.headers.cookie))return void res.status(401).json({error:'Teacher login required'});next();});
 app.get('/api/lessons',(_req,res)=>res.json(store.db.prepare('SELECT id,body FROM lessons ORDER BY rowid DESC').all().map(r=>({id:r.id,lesson:JSON.parse(r.body as string)}))));
 app.get('/api/rooms',(_req,res)=>res.json(store.db.prepare("SELECT id,code,phase FROM rooms WHERE phase!='ENDED' ORDER BY updated DESC").all()));
