@@ -102,4 +102,20 @@ describe('durable rooms',()=>{
       expect(store.snapshot(a).phase).toBe('ENDED');
     }finally{store.db.close();rmSync(dir,{recursive:true});}
   });
+  it('records when a session starts and ends for the session clock',()=>{
+    const dir=mkdtempSync(join(tmpdir(),'clock-')),store=new Store(join(dir,'test.sqlite'));
+    try{
+      const room=store.create(store.lesson(parseLesson(fixture)));
+      expect(store.snapshot(room)).toMatchObject({startedAt:undefined,endedAt:undefined});
+      const before=Date.now();store.action(room,'START');
+      const started=store.snapshot(room).startedAt!;
+      expect(started).toBeGreaterThanOrEqual(before);
+      store.action(room,'NEXT');store.action(room,'PREVIOUS');
+      expect(store.snapshot(room).startedAt).toBe(started);
+      expect(store.snapshot(room).endedAt).toBeUndefined();
+      store.action(room,'END');
+      expect(store.snapshot(room,true).endedAt).toBeGreaterThanOrEqual(started);
+      expect(Math.abs(store.snapshot(room).serverNow-Date.now())).toBeLessThan(1000);
+    }finally{store.db.close();rmSync(dir,{recursive:true});}
+  });
 });

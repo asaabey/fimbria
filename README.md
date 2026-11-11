@@ -114,6 +114,8 @@ The server only downloads from raw.githubusercontent.com over HTTPS, rejects red
 
 To remove a saved lesson, choose it, click **Delete lesson** in the preview and confirm. Deletion removes it from the saved list only: sessions already started from it keep their own copy and stay resumable. API (teacher login required): `DELETE /api/lessons/:id` returns `{ok:true}`, or 404 if the lesson does not exist.
 
+During a session the teacher's screen shows the current time and a running session timer in the top bar (the timer starts at **Begin lesson** and stops when the session ends), and the room code with a join QR in the lower right corner, for latecomers when the teacher's screen is projected. The presentation display and student phones do not show these.
+
 Unended sessions appear under **Unfinished sessions** on the teacher page, with the lesson title, current step, student count and last activity. **End** (or **End all**) ends them after an inline confirmation, exactly like **End session** in the controls: connected screens show "Session complete", answers are kept, and students can then download the handout. Sessions with no activity for `SESSION_TTL_HOURS` also end automatically. API (teacher login required): `GET /api/rooms`, `POST /api/rooms/:id/end` (404 unknown, 409 already ended) and `POST /api/rooms/end-all` (returns `{ended}`).
 
 The header theme selector offers System, Light, Dark and Paper appearances, remembered per browser. Headings use a local serif font with a sans-serif interface; no font service is required.

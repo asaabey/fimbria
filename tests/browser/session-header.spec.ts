@@ -18,6 +18,9 @@ test('session top bar shows connection and room, and a progress bar tracks the s
     const student=await studentContext.newPage();
     await student.goto('/join?code='+code);
     await student.getByRole('button',{name:'Join',exact:true}).click();
+    // Lobby: the session timer has not started, and the big lobby QR is the only one.
+    await expect(page.locator('header .session-time')).toContainText('Not started');
+    await expect(page.locator('.join-corner')).toHaveCount(0);
     await page.getByRole('button',{name:'Begin lesson'}).click();
     await page.getByRole('button',{name:'Next',exact:true}).click();
     for(const screen of [page,display,student]){
@@ -30,6 +33,21 @@ test('session top bar shows connection and room, and a progress bar tracks the s
       await expect(bar).toHaveAttribute('aria-valuetext',`Step 2 of ${fixture.steps.length}`);
       expect(await screen.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     }
+    // Teacher screen only: running clock, session timer ticking each second, and the join corner.
+    await expect(page.locator('header .current-time time')).toHaveText(/^\d{1,2}:\d{2}/);
+    const elapsed=page.locator('header .session-time .elapsed');
+    await expect(elapsed).toHaveText(/^0:0\d$/);
+    const before=await elapsed.textContent();
+    await expect(elapsed).not.toHaveText(before!,{timeout:3000});
+    const corner=page.getByRole('complementary',{name:'Join this class'});
+    await expect(corner).toContainText(code);
+    await expect(corner.getByRole('img',{name:`QR code to join room ${code}`})).toBeVisible();
+    const box=(await corner.boundingBox())!;
+    expect(box.x+box.width).toBeGreaterThan(1366-40);expect(box.y+box.height).toBeGreaterThan(900-40);
+    for(const screen of [display,student]){
+      await expect(screen.locator('header .status-badge')).toHaveCount(0);
+      await expect(screen.locator('.join-corner')).toHaveCount(0);
+    }
     // The lesson title now sits close under the top bar.
     for(const screen of [page,display,student])expect((await screen.locator('.session-title').boundingBox())!.y).toBeLessThan(140);
     // The phone keeps the top bar on one row.
@@ -38,6 +56,13 @@ test('session top bar shows connection and room, and a progress bar tracks the s
     await page.screenshot({path:'test-results/header-teacher.png'});
     await display.screenshot({path:'test-results/header-display.png'});
     await student.screenshot({path:'test-results/header-mobile.png'});
+    // Ending freezes the timer and removes the join corner.
+    await page.getByRole('button',{name:'End session'}).click();
+    await expect(page.locator('header .session-time')).toHaveClass(/stopped/);
+    await expect(page.locator('.join-corner')).toHaveCount(0);
+    const frozen=await elapsed.textContent();
+    await page.waitForTimeout(1500);
+    await expect(elapsed).toHaveText(frozen!);
     // Without a socket connection the plug shows unplugged and students are reassured.
     const offline=await studentContext.newPage();
     await offline.route('**/socket.io/**',route=>route.abort());

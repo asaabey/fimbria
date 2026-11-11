@@ -15,6 +15,10 @@ export class Store {
       CREATE TABLE IF NOT EXISTS rooms(id TEXT PRIMARY KEY, code TEXT UNIQUE, lesson TEXT NOT NULL, idx INTEGER DEFAULT -1, phase TEXT DEFAULT 'WAITING', revision INTEGER DEFAULT 0, visited TEXT DEFAULT '[]', revealed TEXT DEFAULT '[]', closed TEXT DEFAULT '[]', updated INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS participants(token TEXT PRIMARY KEY, room TEXT NOT NULL REFERENCES rooms(id));
       CREATE TABLE IF NOT EXISTS answers(room TEXT NOT NULL, participant TEXT NOT NULL, question TEXT NOT NULL, option TEXT NOT NULL, PRIMARY KEY(room,participant,question));`);
+    // Session clock: when the teacher began the lesson and when the session ended (added after launch).
+    const columns=new Set(this.db.prepare('PRAGMA table_info(rooms)').all().map(c=>c.name as string));
+    if(!columns.has('started'))this.db.exec('ALTER TABLE rooms ADD COLUMN started INTEGER');
+    if(!columns.has('ended'))this.db.exec('ALTER TABLE rooms ADD COLUMN ended INTEGER');
   }
   lesson(input:Lesson){const id=randomUUID();this.db.prepare('INSERT INTO lessons VALUES (?,?)').run(id,JSON.stringify(input));return id;}
   // Rooms keep their own copy of the lesson body, so deleting a saved lesson never affects sessions.
@@ -54,7 +58,8 @@ export class Store {
       phase=revealed.includes(lesson.steps[index].id)?'REVEALED':'ACTIVE';
       if(!visited.includes(lesson.steps[index].id))visited.push(lesson.steps[index].id);
     }
-    this.db.prepare('UPDATE rooms SET idx=?,phase=?,visited=?,revealed=?,closed=?,revision=revision+1,updated=? WHERE id=?').run(index,phase,JSON.stringify(visited),JSON.stringify(revealed),JSON.stringify(closed),Date.now(),r.id);
+    const at=Date.now();
+    this.db.prepare('UPDATE rooms SET idx=?,phase=?,visited=?,revealed=?,closed=?,revision=revision+1,updated=?,started=COALESCE(started,?),ended=? WHERE id=?').run(index,phase,JSON.stringify(visited),JSON.stringify(revealed),JSON.stringify(closed),at,action==='START'?at:null,phase==='ENDED'?at:null,r.id);
   }
   vote(id:string,token:string,question:string,option:string,revision:number){
     this.verify(id,token);
@@ -81,7 +86,7 @@ export class Store {
     if(step?.type==='question'&&!revealed){delete step.correctOptionId;delete step.explanation;}
     const rows=source?this.db.prepare('SELECT option,COUNT(*) AS n FROM answers WHERE room=? AND question=? GROUP BY option').all(r.id,source.id):[];
     const totals=Object.fromEntries(rows.map(row=>[row.option,Number(row.n)]));
-    const base:Snapshot={id:r.id,code:r.code,title:lesson.title,phase:r.phase,revision:r.revision,index:r.idx,stepCount:lesson.steps.length,step,participants:Number(this.db.prepare('SELECT COUNT(*) AS n FROM participants WHERE room=?').get(r.id)!.n),closed:r.phase!=='ACTIVE'||!!source&&JSON.parse(r.closed).includes(source.id),totals:revealed?totals:undefined,joinUrl:`${this.baseUrl}/join?code=${r.code}`};
+    const base:Snapshot={id:r.id,code:r.code,title:lesson.title,phase:r.phase,revision:r.revision,index:r.idx,stepCount:lesson.steps.length,step,participants:Number(this.db.prepare('SELECT COUNT(*) AS n FROM participants WHERE room=?').get(r.id)!.n),closed:r.phase!=='ACTIVE'||!!source&&JSON.parse(r.closed).includes(source.id),totals:revealed?totals:undefined,joinUrl:`${this.baseUrl}/join?code=${r.code}`,startedAt:r.started??undefined,endedAt:r.ended??undefined,serverNow:Date.now()};
     const teacher:Snapshot={...base,responses:rows.reduce((n,row)=>n+Number(row.n),0)};
     let answers:Map<string,string>|undefined;
     const answerOf=(token:string)=>{
@@ -118,8 +123,10 @@ export class Store {
   endAll():string[]{
     const ids=this.sessions().map(s=>s.id);
     this.lessons.clear();
-    this.db.prepare("UPDATE rooms SET phase='ENDED',revision=revision+1,updated=? WHERE phase!='ENDED'").run(Date.now());
+    const at=Date.now();
+    this.db.prepare("UPDATE rooms SET phase='ENDED',revision=revision+1,updated=?,ended=? WHERE phase!='ENDED'").run(at,at);
     return ids;
   }
-  expire(ms:number){this.lessons.clear();this.db.prepare("UPDATE rooms SET phase='ENDED',revision=revision+1 WHERE phase!='ENDED' AND updated<?").run(Date.now()-ms);}
+  // An idle session counts as ended at its last activity.
+  expire(ms:number){this.lessons.clear();this.db.prepare("UPDATE rooms SET phase='ENDED',revision=revision+1,ended=updated WHERE phase!='ENDED' AND updated<?").run(Date.now()-ms);}
 }

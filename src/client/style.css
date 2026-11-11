@@ -280,9 +280,22 @@ li p { margin: 6px 0; }
 .in-room .wordmark { font-size: 1.6rem; }
 .in-room .wordmark span { display: none; }
 .session-status { display: flex; align-items: center; gap: 10px; margin-right: auto; flex-wrap: wrap; }
-.connection, .room-badge { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 12px; border: 1px solid var(--border); border-radius: 999px; font-size: .85rem; color: var(--muted); background: var(--surface); white-space: nowrap; }
+.connection, .room-badge, .status-badge { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 12px; border: 1px solid var(--border); border-radius: 999px; font-size: .85rem; color: var(--muted); background: var(--surface); white-space: nowrap; }
 .connection.online .plug-icon { color: var(--accent); }
 .connection.offline { color: var(--error-text); border-color: var(--error-border); background: var(--error-background); }
+.status-badge { font-variant-numeric: tabular-nums; }
+.status-badge .status-icon { color: var(--accent); flex-shrink: 0; }
+.status-badge time, .status-badge .elapsed { color: var(--text); font-weight: 600; }
+.session-time.stopped .status-icon { color: var(--muted); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Join corner (teacher screen only): room code and QR for latecomers when the teacher's screen is projected. */
+.join-corner { position: fixed; right: 16px; bottom: 16px; z-index: 10; display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 6px 24px #0002; }
+.join-corner img { display: block; width: 104px; height: 104px; border-radius: 4px; background: #fff; }
+.join-corner div { display: flex; flex-direction: column; gap: 2px; }
+.join-label { font-size: .8rem; color: var(--muted); }
+.join-code { font-size: 1.9rem; letter-spacing: .08em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.teacher-session.in-room { padding-bottom: 160px; }
+@media (max-width: 900px) { .teacher-session .join-corner { display: none; } .teacher-session.in-room { padding-bottom: 24px; } }
 .room-badge strong { color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
 .reconnecting { margin: 0 0 12px; padding: 8px 12px; border-radius: 6px; font-size: .9rem; color: var(--error-text); background: var(--error-background); }
 .title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px 32px; margin: 4px 0 16px; }
@@ -298,6 +311,9 @@ li p { margin: 6px 0; }
   .in-room .theme-selector > label, .in-room .theme-selector > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .session-status { gap: 6px; flex-wrap: nowrap; }
   .connection { padding: 4px 8px; }
+  .current-time { display: none; }
+  .in-room .wordmark { white-space: nowrap; flex-shrink: 0; }
+  .status-badge { padding: 4px 8px; }
   .connection-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .room-badge { padding: 4px 10px; }
   .title-row { flex-direction: column; align-items: stretch; gap: 8px; }
