@@ -9,3 +9,5 @@ export type Snapshot = {id:string;code:string;title:string;phase:'WAITING'|'ACTI
 export type Reply<T=unknown> = {ok:true;data:T}|{ok:false;error:string};
 // Printable lesson handout. Teachers get vote totals for a session; a student gets their own answers.
 export type Handout = {lesson:Lesson;code?:string;ended?:boolean;answers?:Record<string,string>;totals?:Record<string,Record<string,number>>};
+// Unended sessions listed on the teacher home page.
+export type SessionSummary = {id:string;code:string;phase:Snapshot['phase'];title:string;index:number;stepCount:number;participants:number;updated:number};

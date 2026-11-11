@@ -2,7 +2,7 @@ import {DatabaseSync} from 'node:sqlite';
 import {mkdirSync} from 'node:fs';
 import {dirname} from 'node:path';
 import {randomBytes,randomInt,randomUUID} from 'node:crypto';
-import type {Action,Handout,Lesson,Snapshot} from '../shared/contracts.js';
+import type {Action,Handout,Lesson,SessionSummary,Snapshot} from '../shared/contracts.js';
 export class Store {
   db:DatabaseSync;
   constructor(path:string, public baseUrl='http://localhost:3000'){
@@ -92,6 +92,17 @@ export class Store {
     const totals:Record<string,Record<string,number>>={};
     for(const row of this.db.prepare('SELECT question,option,COUNT(*) AS n FROM answers WHERE room=? GROUP BY question,option').all(r.id))(totals[row.question as string]??={})[row.option as string]=Number(row.n);
     return {lesson,code:r.code,ended:r.phase==='ENDED',totals};
+  }
+  sessions():SessionSummary[]{
+    return this.db.prepare("SELECT r.id,r.code,r.phase,r.idx,r.lesson,r.updated,(SELECT COUNT(*) FROM participants p WHERE p.room=r.id) AS n FROM rooms r WHERE r.phase!='ENDED' ORDER BY r.updated DESC").all().map(r=>{
+      const lesson:Lesson=JSON.parse(r.lesson as string);
+      return {id:r.id as string,code:r.code as string,phase:r.phase as SessionSummary['phase'],title:lesson.title,index:Number(r.idx),stepCount:lesson.steps.length,participants:Number(r.n),updated:Number(r.updated)};
+    });
+  }
+  endAll():string[]{
+    const ids=this.sessions().map(s=>s.id);
+    this.db.prepare("UPDATE rooms SET phase='ENDED',revision=revision+1,updated=? WHERE phase!='ENDED'").run(Date.now());
+    return ids;
   }
   expire(ms:number){this.db.prepare("UPDATE rooms SET phase='ENDED',revision=revision+1 WHERE phase!='ENDED' AND updated<?").run(Date.now()-ms);}
 }

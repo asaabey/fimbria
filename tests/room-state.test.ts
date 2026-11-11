@@ -86,4 +86,20 @@ describe('durable rooms',()=>{
       expect(handout.lesson.steps[2]).toMatchObject({correctOptionId:'a',explanation:fixture.steps[2].explanation});
     }finally{store.db.close();rmSync(dir,{recursive:true});}
   });
+  it('lists unended sessions with their lesson, step and students',()=>{
+    const dir=mkdtempSync(join(tmpdir(),'sessions-')),store=new Store(join(dir,'test.sqlite'));
+    try{
+      const lesson=store.lesson(parseLesson(fixture)),a=store.create(lesson),b=store.create(lesson);
+      store.join(store.snapshot(a).code);store.action(a,'START');store.action(a,'NEXT');
+      expect(store.sessions()).toEqual([
+        expect.objectContaining({id:a,phase:'ACTIVE',title:fixture.title,index:1,stepCount:fixture.steps.length,participants:1}),
+        expect.objectContaining({id:b,phase:'WAITING',index:-1,participants:0}),
+      ]);
+      store.action(b,'END');
+      expect(store.sessions().map(s=>s.id)).toEqual([a]);
+      expect(store.endAll()).toEqual([a]);
+      expect(store.sessions()).toEqual([]);
+      expect(store.snapshot(a).phase).toBe('ENDED');
+    }finally{store.db.close();rmSync(dir,{recursive:true});}
+  });
 });

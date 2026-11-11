@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Teachers can end unfinished sessions from the home page, one at a time or all at once, after confirming (`POST /api/rooms/:id/end`, `POST /api/rooms/end-all`). The list now shows each session's lesson, step, students and last activity.
 - `**bold**` and `==highlight==` in slide bodies, explanations and list items, themed for every appearance and kept in handouts.
 - Lines starting with `- `, `* `, `• ` or `1. ` in slide bodies and explanations render as bulleted or numbered lists on every screen and in handouts.
 - Printable lesson handouts saved as PDF through the browser's print dialog: teachers from the lesson preview or the session controls (with response counts), students after the session ends (with answers, explanations and their own responses). `GET /api/handout`.

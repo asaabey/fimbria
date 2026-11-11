@@ -53,7 +53,7 @@ app.get('/api/handout',(req,res)=>{
 });
 app.use('/api', (req,res,next)=>{if(!authorized(req.headers.cookie))return void res.status(401).json({error:'Teacher login required'});next();});
 app.get('/api/lessons',(_req,res)=>res.json(store.db.prepare('SELECT id,body FROM lessons ORDER BY rowid DESC').all().map(r=>({id:r.id,lesson:JSON.parse(r.body as string)}))));
-app.get('/api/rooms',(_req,res)=>res.json(store.db.prepare("SELECT id,code,phase FROM rooms WHERE phase!='ENDED' ORDER BY updated DESC").all()));
+app.get('/api/rooms',(_req,res)=>res.json(store.sessions()));
 app.post('/api/lessons',(req,res)=>{try{const lesson=parseLesson(req.body);res.json({id:store.lesson(lesson),lesson});}catch(e){res.status(400).json({error:(e as Error).message});}});
 app.post('/api/lessons/import',async(req,res)=>{
   try {
@@ -65,6 +65,12 @@ app.post('/api/lessons/import',async(req,res)=>{
 });
 app.delete('/api/lessons/:id',(req,res)=>{try{store.deleteLesson(req.params.id);res.json({ok:true});}catch(e){res.status(404).json({error:(e as Error).message});}});
 app.post('/api/rooms',(req,res)=>{try{res.json({id:store.create(req.body.lessonId)});}catch(e){res.status(400).json({error:(e as Error).message});}});
+// End a session from the teacher home page (same as End session in the controls); connected screens update.
+app.post('/api/rooms/end-all',(_req,res)=>{const ids=store.endAll();ids.forEach(broadcast);res.json({ended:ids.length});});
+app.post('/api/rooms/:id/end',(req,res)=>{
+  try{const {id}=store.room(req.params.id);store.action(id,'END');broadcast(id);res.json({ok:true});}
+  catch(e){const message=(e as Error).message;res.status(message==='Room not found'?404:409).json({error:message});}
+});
 function broadcast(id:string){for(const socket of io.sockets.sockets.values())if(socket.data.room===id)socket.emit('room_state_update',store.snapshot(id,socket.data.teacher,socket.data.credential));}
 io.on('connection',socket=>{
   const handle=(event:string,fn:(data:any)=>unknown)=>socket.on(event,(data,ack)=>{if(typeof ack!=='function')return;try{ack({ok:true,data:fn(data||{})});}catch(e){ack({ok:false,error:(e as Error).message});}});

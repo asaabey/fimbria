@@ -51,3 +51,5 @@ Slides and questions also take an optional `table` (`rows` of string/number cell
 `src/client/BodyText.tsx` renders slide bodies and explanations: `- `/`* `/`• ` lines become `<ul>`, `1. `/`1) ` lines `<ol>`, other text stays pre-wrapped prose; `emphasis()` turns `**bold**` into `<strong>` and `==highlight==` into `<mark>` (`--highlight`/`--on-highlight` tokens). Use it wherever that text appears.
 
 In a room, `main` gets `in-room`: the header holds the connection badge and room code (`src/client/SessionStatus.tsx`: `PlugIcon`, `StepProgress`), and `.title-row` pairs the title with the step progress bar. Browser tests set `LOGIN_ATTEMPTS_PER_MINUTE=100`, because the suite signs in more than 10 times a minute.
+
+The teacher home lists `Store.sessions()` (unended rooms with lesson title, step, participants, last activity); `POST /api/rooms/:id/end` and `/api/rooms/end-all` end them and broadcast. The End all browser test runs in a separate Playwright project after the others because it ends every session on the shared test server.
