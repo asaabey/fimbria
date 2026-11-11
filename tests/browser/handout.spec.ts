@@ -4,7 +4,7 @@ import tables from '../../examples/tables.json' with {type:'json'};
 // Record print calls instead of opening the dialog; the handout opens it automatically once images load.
 const stubPrint=()=>{(window as any).printCalls=0;window.print=()=>{(window as any).printCalls++;};};
 const lesson={...tables,id:'handout-lesson',title:'Handout lesson',steps:[
-  {id:'strip',type:'slide',title:'Look before you label',body:'Describe, in order:\n- Rate\n- Rhythm\n- Each wave',image:{src:'/media/sample-ecg-strip.svg',alt:'Lead II rhythm strip with peaked T waves',caption:'Sample strip'}},
+  {id:'strip',type:'slide',title:'Look before you label',body:'Describe, **in order**:\n- Rate\n- ==Rhythm==\n- Each wave',image:{src:'/media/sample-ecg-strip.svg',alt:'Lead II rhythm strip with peaked T waves',caption:'Sample strip'}},
   ...tables.steps,
   {id:'clip',type:'video',title:'Recap',src:'https://www.youtube.com/watch?v=M7lc1UVf-VE&t=90'},
 ]};
@@ -23,6 +23,7 @@ test('teacher and students download a printable lesson handout',async({page,cont
   await expect(teacherCopy.getByText('Teacher copy with answers')).toBeVisible();
   await expect(teacherCopy.locator('.handout-step')).toHaveCount(lesson.steps.length);
   await expect(teacherCopy.locator('.body ul li')).toHaveText(['Rate','Rhythm','Each wave']);
+  await expect(teacherCopy.locator('.body mark')).toHaveText('Rhythm');
   await expect(teacherCopy.locator('li.correct')).toContainText('Perform a 12-lead ECG now');
   await expect(teacherCopy.getByRole('table',{name:'Results today'})).toBeVisible();
   await expect(teacherCopy.getByRole('link',{name:'https://www.youtube.com/watch?v=M7lc1UVf-VE&t=90'})).toBeVisible();
@@ -50,7 +51,14 @@ test('teacher and students download a printable lesson handout',async({page,cont
     const bullets=student.locator('.body ul li');
     await expect(bullets).toHaveText(['Rate','Rhythm','Each wave']);
     expect(await bullets.first().evaluate(li=>getComputedStyle(li).display)).toBe('list-item');
+    // **bold** and ==highlight== stand out instead of showing their markers.
+    await expect(student.locator('.body strong')).toHaveText('in order');
+    await expect(student.locator('.body mark')).toHaveText('Rhythm');
+    await expect(student.locator('.body')).not.toContainText('**');
     await student.screenshot({path:'test-results/bullets-mobile.png'});
+    await student.evaluate(()=>{document.documentElement.dataset.theme='dark';});
+    await student.screenshot({path:'test-results/emphasis-mobile-dark.png'});
+    await student.evaluate(()=>{document.documentElement.dataset.theme='light';});
     await page.getByRole('button',{name:'Next',exact:true}).click();
     await page.getByRole('button',{name:'Next',exact:true}).click();
     await student.getByRole('button',{name:/Repeat the potassium/}).click();

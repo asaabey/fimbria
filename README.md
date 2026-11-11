@@ -153,9 +153,9 @@ Slides and questions accept an optional `table`, for lab results, reference rang
 
 A question's table is visible before the vote, so it must not contain the answer. See `examples/tables.json`.
 
-## Lists in slide text
+## Lists and emphasis in slide text
 
-Slide bodies and explanations are plain text, but consecutive lines starting with `- `, `* ` or `• ` show as a bulleted list, and lines starting with `1. ` or `1) ` as a numbered list, everywhere the text appears (classroom screens, preview and handout). Other text keeps its line breaks. Markdown and HTML are not rendered.
+Slide bodies and explanations are plain text, but consecutive lines starting with `- `, `* ` or `• ` show as a bulleted list, and lines starting with `1. ` or `1) ` as a numbered list, everywhere the text appears (classroom screens, preview and handout). Other text keeps its line breaks. Within a line, `**words**` show in bold and `==words==` are highlighted (themed for light, dark and paper, and kept in the PDF). Markers must touch the words and close on the same line, so `a == b` stays as typed. Other Markdown and HTML are not rendered.
 
 ## Download a lesson PDF
 

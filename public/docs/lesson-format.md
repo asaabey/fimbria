@@ -32,15 +32,22 @@ What this means for authors:
   download a PDF of every step with the correct answers and explanations,
   so write explanations that still make sense when read later. Videos
   appear as their title and link.
-- **Text is plain, with lists.** Markdown and HTML are not rendered:
-  `**bold**` shows up literally. In a slide `body` and an `explanation`, line
-  breaks (`\n`) are kept, and lists are shown as real lists:
+- **Text is plain, with lists and emphasis.** HTML is not rendered, and
+  neither is Markdown beyond what is listed here. In a slide `body` and an
+  `explanation`:
+  - line breaks (`\n`) are kept
   - consecutive lines starting with `- `, `* ` or `• ` become a bulleted list
   - consecutive lines starting with `1. ` or `1) ` become a numbered list,
     counting from the first line's number
+  - `**words**` show in **bold**, and `==words==` are highlighted like a
+    highlighter pen. They work inside list items and can be combined
+    (`**Treat ==urgently==**`). The markers must touch the words
+    (`a == b` stays as typed) and close on the same line.
 
-  For example, `"Check:\n- Airway\n- Breathing\n- Circulation"` shows
-  "Check:" followed by three bullets. Don't add a blank line between items.
+  For example, `"Check the **potassium** first:\n- ==ECG now==\n- Repeat bloods"`
+  shows a line with "potassium" in bold, then two bullets, the first
+  highlighted. Don't add a blank line between list items. Titles, prompts
+  and options are always plain.
 
 ## File structure
 
@@ -82,7 +89,7 @@ Every step needs an `id` (1-100 characters, **unique within the lesson**) and a 
 | Field | Required | Rules |
 |-------|----------|-------|
 | `title` | yes | 1-200 characters |
-| `body` | yes | 0-10,000 characters of plain text; line breaks are kept and `- ` / `1. ` lines become lists |
+| `body` | yes | 0-10,000 characters of plain text; line breaks are kept, `- ` / `1. ` lines become lists, `**bold**` and `==highlight==` work |
 | `image` | no | See [Images](#images) |
 | `table` | no | See [Tables](#tables). Shown under the body |
 
@@ -245,7 +252,9 @@ Fimbria checks these after the JSON Schema passes:
 - **Explanations.** Say why the correct answer is right and why the
   tempting wrong answer is wrong. This is the teaching moment.
 - **Readability.** Slide bodies are read from a projector, so keep them to a
-  few short lines or a short `- ` list rather than paragraphs.
+  few short lines or a short `- ` list rather than paragraphs. Save bold and
+  highlight for the one or two words per slide that matter most; if
+  everything stands out, nothing does.
 - **Tables.** Use a table for structured data such as results, ranges or
   comparisons, rather than spelling it out in prose. Put units in the column
   header or the cell.

@@ -48,6 +48,6 @@ Slides and questions also take an optional `table` (`rows` of string/number cell
 
 `src/client/Handout.tsx` renders the printable handout at `/handout?lesson=<id>` or `/handout?room=<id|code>` and opens the print dialog once images load; print styles live at the end of `style.css`. `Store.handout` enforces access: teachers any time, students (participant credential via `X-Participant`) only after the session ends, with their own answers and no class totals.
 
-`src/client/BodyText.tsx` renders slide bodies and explanations: `- `/`* `/`• ` lines become `<ul>`, `1. `/`1) ` lines `<ol>`, other text stays pre-wrapped prose. Use it wherever that text appears.
+`src/client/BodyText.tsx` renders slide bodies and explanations: `- `/`* `/`• ` lines become `<ul>`, `1. `/`1) ` lines `<ol>`, other text stays pre-wrapped prose; `emphasis()` turns `**bold**` into `<strong>` and `==highlight==` into `<mark>` (`--highlight`/`--on-highlight` tokens). Use it wherever that text appears.
 
 In a room, `main` gets `in-room`: the header holds the connection badge and room code (`src/client/SessionStatus.tsx`: `PlugIcon`, `StepProgress`), and `.title-row` pairs the title with the step progress bar. Browser tests set `LOGIN_ATTEMPTS_PER_MINUTE=100`, because the suite signs in more than 10 times a minute.

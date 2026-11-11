@@ -16,4 +16,15 @@ describe('slide body text',()=>{
   it('separates bullet and numbered lists that touch',()=>{
     expect(html('- a\n1. b')).toBe('<div class="body"><ul><li>a</li></ul><ol start="1"><li>b</li></ol></div>');
   });
+  it('renders **bold** and ==highlight==, including inside list items and each other',()=>{
+    expect(html('Check the **potassium** first.\n- ==ECG now==\n- **Treat ==urgently==**')).toBe('<div class="body"><p>Check the <strong>potassium</strong> first.</p><ul><li><mark>ECG now</mark></li><li><strong>Treat <mark>urgently</mark></strong></li></ul></div>');
+  });
+  it('leaves loose or unmatched markers as typed and never renders HTML',()=>{
+    expect(html('a == b and c ** d')).toBe('<div class="body"><p>a == b and c ** d</p></div>');
+    expect(html('**unclosed and ==open')).toBe('<div class="body"><p>**unclosed and ==open</p></div>');
+    expect(html('**<b>x</b>**')).toBe('<div class="body"><p><strong>&lt;b&gt;x&lt;/b&gt;</strong></p></div>');
+  });
+  it('keeps emphasis within one line',()=>{
+    expect(html('**start\nend**')).toBe('<div class="body"><p>**start\nend**</p></div>');
+  });
 });
