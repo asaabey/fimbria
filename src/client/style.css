@@ -62,6 +62,7 @@ main { max-width: 880px; margin: auto; padding: 32px; }
 header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-bottom: 52px; }
 a { color: var(--accent); text-underline-offset: 4px; overflow-wrap: anywhere; }
 .wordmark { font-family: Georgia, "Times New Roman", serif; font-size: 2rem; letter-spacing: -.045em; text-decoration: none; line-height: 1.1; }
+.brand-mark { display: inline-block; width: 1.15em; height: 1.15em; margin-right: .22em; vertical-align: -.22em; background: currentColor; print-color-adjust: exact; -webkit-print-color-adjust: exact; mask: url('/logo.svg') center / contain no-repeat; -webkit-mask: url('/logo.svg') center / contain no-repeat; }
 .wordmark span { display: block; font: 400 .72rem/1.6 "Avenir Next", Avenir, "Segoe UI", sans-serif; letter-spacing: .015em; color: var(--muted); margin-top: 8px; }
 .header-tools { display: flex; align-items: center; gap: 24px; }
 .header-tools > a { font-size: .9rem; }

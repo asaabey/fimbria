@@ -33,7 +33,7 @@ export function Handout(){
   const student=!!data?.answers;
   return <main className="handout">
     <div className="handout-toolbar" role="group" aria-label="Handout actions">
-      <a className="wordmark" href="/">Fimbria</a>
+      <a className="wordmark" href="/"><i className="brand-mark" aria-hidden="true"/>Fimbria</a>
       {data&&<><button disabled={!ready} onClick={()=>window.print()}>Save as PDF</button><p className="muted">In the print window, choose <strong>Save as PDF</strong> as the printer.</p></>}
     </div>
     {error?<section><h1>Handout unavailable</h1><p role="alert" className="error">{error}</p></section>:!data?<p role="status">Preparing your handout…</p>:<>
