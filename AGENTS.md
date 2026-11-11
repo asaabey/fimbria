@@ -53,3 +53,5 @@ Slides and questions also take an optional `table` (`rows` of string/number cell
 In a room, `main` gets `in-room`: the header holds the connection badge and room code (`src/client/SessionStatus.tsx`: `PlugIcon`, `StepProgress`), and `.title-row` pairs the title with the step progress bar. Browser tests set `LOGIN_ATTEMPTS_PER_MINUTE=100`, because the suite signs in more than 10 times a minute.
 
 The teacher home lists `Store.sessions()` (unended rooms with lesson title, step, participants, last activity); `POST /api/rooms/:id/end` and `/api/rooms/end-all` end them and broadcast. The End all browser test runs in a separate Playwright project after the others because it ends every session on the shared test server.
+
+Broadcasting: every screen joins the Socket.IO room named after its room id. `broadcast()` (host actions) sends to all screens using `Store.views()`, built once per room; `notifyTeachers()` (joins, votes) sends only to teacher screens plus the acting student. Do not broadcast per-vote or per-join updates to every screen: it makes a question round O(N²). `scripts/load-test.mjs` is the capacity test; README records results.

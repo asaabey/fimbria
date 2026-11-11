@@ -71,7 +71,18 @@ app.post('/api/rooms/:id/end',(req,res)=>{
   try{const {id}=store.room(req.params.id);store.action(id,'END');broadcast(id);res.json({ok:true});}
   catch(e){const message=(e as Error).message;res.status(message==='Room not found'?404:409).json({error:message});}
 });
-function broadcast(id:string){for(const socket of io.sockets.sockets.values())if(socket.data.room===id)socket.emit('room_state_update',store.snapshot(id,socket.data.teacher,socket.data.credential));}
+// Every screen in a room is in the Socket.IO room of the same id. Views are built once per broadcast.
+const screens=(id:string)=>[...(io.sockets.adapter.rooms.get(id)??[])].map(sid=>io.sockets.sockets.get(sid)).filter(s=>!!s);
+const viewFor=(views:ReturnType<Store['views']>,socket:{data:any})=>socket.data.teacher?views.teacher:socket.data.credential?views.student(socket.data.credential):views.base;
+// Host actions change what everyone sees.
+function broadcast(id:string){const views=store.views(id);for(const socket of screens(id))socket.emit('room_state_update',viewFor(views,socket));}
+// Joins and votes change only the teacher's counts (and the voter's own answer), so only those screens hear about them.
+// Sending them to every screen made a question round cost N² updates and capped a room at about 200 students.
+function notifyTeachers(id:string,also?:{data:any;emit:Function}){
+  const views=store.views(id);
+  for(const socket of screens(id))if(socket.data.teacher)socket.emit('room_state_update',views.teacher);
+  if(also&&!also.data.teacher)also.emit('room_state_update',viewFor(views,also));
+}
 io.on('connection',socket=>{
   const handle=(event:string,fn:(data:any)=>unknown)=>socket.on(event,(data,ack)=>{if(typeof ack!=='function')return;try{ack({ok:true,data:fn(data||{})});}catch(e){ack({ok:false,error:(e as Error).message});}});
   handle('join_room',data=>{
@@ -80,7 +91,9 @@ io.on('connection',socket=>{
       socket.data.teacher=true;socket.data.room=store.room(data.roomId).id;
     }else if(data.role==='display'){socket.data.room=store.room(data.roomId).id;socket.data.teacher=false;}
     else{const joined=store.join(data.roomId,data.credential);socket.data.room=joined.id;socket.data.credential=joined.credential;socket.data.teacher=false;}
-    broadcast(socket.data.room);
+    for(const joined of socket.rooms)if(joined!==socket.id&&joined!==socket.data.room)socket.leave(joined);
+    socket.join(socket.data.room);
+    if(data.role!=='teacher'&&data.role!=='display')notifyTeachers(socket.data.room);
     return {credential:socket.data.credential,state:store.snapshot(socket.data.room,socket.data.teacher,socket.data.credential)};
   });
   handle('host_action',data=>{
@@ -90,7 +103,7 @@ io.on('connection',socket=>{
   handle('submit_vote',data=>{
     if(!socket.data.credential)throw new Error('Join first');
     const answer=store.vote(socket.data.room,socket.data.credential,data.questionId,data.optionId,data.revision);
-    broadcast(socket.data.room);return {answer};
+    notifyTeachers(socket.data.room,socket);return {answer};
   });
 });
 setInterval(()=>{store.expire(Number(process.env.SESSION_TTL_HOURS||24)*3600000);for(const id of new Set([...io.sockets.sockets.values()].map(s=>s.data.room).filter(Boolean)))broadcast(id);},60000).unref();

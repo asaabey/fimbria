@@ -53,6 +53,26 @@ Socket.IO events use acknowledged replies `{ok:true,data}` or `{ok:false,error}`
 
 Session phases are WAITING, ACTIVE, REVEALED, ENDED. Leaving a question closes it permanently. Revealed answers remain visible on revisits. Participant counts represent registered identities, including disconnected browsers. Teacher disconnects leave sessions running. Anonymous users can obtain another identity in a different browser.
 
+## Capacity and load testing
+
+`scripts/load-test.mjs` ramps students into one room in stages. Each stage joins N students over `--join-window` seconds, moves to a question, has everyone vote at a random moment within `--vote-window` seconds, reveals, and ends the room. It reports fan-out time (until every screen shows the teacher's Next or Reveal), vote acceptance time, failures, disconnects and data received, and stops at the first stage past `--max-p95` ms or 1% failures. Students are spread across `--workers` processes. It is plain JavaScript, so it runs with Node and `npm ci` alone:
+
+```sh
+TEACHER_PASSWORD=... node scripts/load-test.mjs --base http://host:3005 --stages 40,160,400,800,1000 --workers 6
+```
+
+Run it against a separate copy with its own database, not production. Results on the production VM (VM 202, 4 vCPU, Node uses one core), 2026-11-12, one room, votes within 10 seconds:
+
+| Students | Path | Next reaches all (max) | Vote accepted p50 / p95 | Failures |
+|---|---|---|---|---|
+| 200 (before targeted updates) | LAN | 51 ms | 563 / 2,725 ms | 0 |
+| 800 | LAN | 59 ms | 67 / 125 ms | 0 |
+| 1,000 | LAN | 179 ms | 118 / 198 ms | 0 |
+| 1,500 | LAN | 102 ms | 2,314 / 5,402 ms | 0 (too slow) |
+| 1,000 | Cloudflare | 142 ms | 197 / 307 ms | 0 |
+
+One room comfortably serves about 1,000 students; voting slows past that (CPU stays under 50%, so per-vote SQLite writes are the likely next limit). Joins and votes notify only the teacher and the acting student, because only the teacher's counts change; sending them to every screen made a question cost N² updates and capped a room at about 200.
+
 ## Proxmox / Docker
 
 Use a Linux VM with Docker Compose, initially 2 vCPU / 2 GB RAM. Decide LAN-only versus public HTTPS before external testing.

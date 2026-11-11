@@ -40,7 +40,7 @@ export class Store {
     if(r.phase==='ENDED')throw new Error('Session has ended');
     let index=r.idx,phase=r.phase;
     const visited:string[]=JSON.parse(r.visited),revealed:string[]=JSON.parse(r.revealed),closed:string[]=JSON.parse(r.closed);
-    if(action==='END')phase='ENDED';
+    if(action==='END'){phase='ENDED';this.lessons.delete(r.id);}
     else if(action==='REVEAL'){
       if(index<0||lesson.steps[index].type!=='question')throw new Error('No active question');
       if(!revealed.includes(lesson.steps[index].id))revealed.push(lesson.steps[index].id);
@@ -69,15 +69,31 @@ export class Store {
     this.db.prepare('UPDATE rooms SET updated=? WHERE id=?').run(Date.now(),id);
     return option;
   }
-  snapshot(id:string,teacher=false,token?:string):Snapshot {
-    const r=this.room(id),lesson:Lesson=JSON.parse(r.lesson),source=lesson.steps[r.idx];
-    const revealed=source && JSON.parse(r.revealed).includes(source.id);
+  // A room's lesson never changes after creation, so parse it once.
+  private lessons=new Map<string,Lesson>();
+  private lessonOf(r:{id:string;lesson:string}):Lesson{let l=this.lessons.get(r.id);if(!l){l=JSON.parse(r.lesson) as Lesson;this.lessons.set(r.id,l);}return l;}
+  // Everything a broadcast needs, computed once per room rather than once per screen:
+  // the teacher view, the shared student/display view, and each student's own answer.
+  views(id:string){
+    const r=this.room(id),lesson=this.lessonOf(r),source=lesson.steps[r.idx];
+    const revealed=!!source&&JSON.parse(r.revealed).includes(source.id);
     let step:any=source?{...source}:undefined;
     if(step?.type==='question'&&!revealed){delete step.correctOptionId;delete step.explanation;}
     const rows=source?this.db.prepare('SELECT option,COUNT(*) AS n FROM answers WHERE room=? AND question=? GROUP BY option').all(r.id,source.id):[];
     const totals=Object.fromEntries(rows.map(row=>[row.option,Number(row.n)]));
-    const answer=token&&source?this.db.prepare('SELECT option FROM answers WHERE room=? AND participant=? AND question=?').get(r.id,token,source.id)?.option as string|undefined:undefined;
-    return {id:r.id,code:r.code,title:lesson.title,phase:r.phase,revision:r.revision,index:r.idx,stepCount:lesson.steps.length,step,participants:Number(this.db.prepare('SELECT COUNT(*) AS n FROM participants WHERE room=?').get(r.id)!.n),responses:teacher?rows.reduce((n,row)=>n+Number(row.n),0):undefined,answer:answer||undefined,closed:r.phase!=='ACTIVE'||!!source&&JSON.parse(r.closed).includes(source.id),totals:revealed?totals:undefined,joinUrl:`${this.baseUrl}/join?code=${r.code}`};
+    const base:Snapshot={id:r.id,code:r.code,title:lesson.title,phase:r.phase,revision:r.revision,index:r.idx,stepCount:lesson.steps.length,step,participants:Number(this.db.prepare('SELECT COUNT(*) AS n FROM participants WHERE room=?').get(r.id)!.n),closed:r.phase!=='ACTIVE'||!!source&&JSON.parse(r.closed).includes(source.id),totals:revealed?totals:undefined,joinUrl:`${this.baseUrl}/join?code=${r.code}`};
+    const teacher:Snapshot={...base,responses:rows.reduce((n,row)=>n+Number(row.n),0)};
+    let answers:Map<string,string>|undefined;
+    const answerOf=(token:string)=>{
+      if(!source)return undefined;
+      answers??=new Map(this.db.prepare('SELECT participant,option FROM answers WHERE room=? AND question=?').all(r.id,source.id).map(row=>[row.participant as string,row.option as string]));
+      return answers.get(token);
+    };
+    return {teacher,base,student:(token:string):Snapshot=>{const answer=answerOf(token);return answer?{...base,answer}:base;}};
+  }
+  snapshot(id:string,teacher=false,token?:string):Snapshot {
+    const v=this.views(id);
+    return teacher?v.teacher:token?v.student(token):v.base;
   }
   // Students may download the full lesson (answers included) only after the session ends.
   handout(key:string,teacher:boolean,credential?:string):Handout {
@@ -101,8 +117,9 @@ export class Store {
   }
   endAll():string[]{
     const ids=this.sessions().map(s=>s.id);
+    this.lessons.clear();
     this.db.prepare("UPDATE rooms SET phase='ENDED',revision=revision+1,updated=? WHERE phase!='ENDED'").run(Date.now());
     return ids;
   }
-  expire(ms:number){this.db.prepare("UPDATE rooms SET phase='ENDED',revision=revision+1 WHERE phase!='ENDED' AND updated<?").run(Date.now()-ms);}
+  expire(ms:number){this.lessons.clear();this.db.prepare("UPDATE rooms SET phase='ENDED',revision=revision+1 WHERE phase!='ENDED' AND updated<?").run(Date.now()-ms);}
 }

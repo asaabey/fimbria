@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Joins and votes update only the teacher's screen and the voter's own, and broadcasts build each view once per room with the lesson parsed once. One room now serves about 1,000 students with votes accepted in under 0.3 s (p95), up from about 200. Added `scripts/load-test.mjs`, a staged ramp load test.
 - Session screens use a compact top bar holding a plug connection indicator (unplugged and red while reconnecting) and the room code, with a step progress bar beside the lesson title, so the lesson starts higher on the screen.
 - Teacher login attempts per minute are configurable with `LOGIN_ATTEMPTS_PER_MINUTE` (default 10).
 - Keep teacher lesson previews and session controls alongside lesson content, and improve student layouts and answer visibility on mobile.
