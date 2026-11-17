@@ -27,4 +27,14 @@ describe('slide body text',()=>{
   it('keeps emphasis within one line',()=>{
     expect(html('**start\nend**')).toBe('<div class="body"><p>**start\nend**</p></div>');
   });
+  it('renders paired effects inside lists and nested with other emphasis',()=>{
+    expect(html('[fade]Pause.[/fade]\n- [marker]Check **evidence**[/marker]\n- **[underline]Reassess[/underline]**')).toBe('<div class="body"><p><span class="text-fade">Pause.</span></p><ul><li><mark class="text-marker">Check <strong>evidence</strong></mark></li><li><strong><span class="text-underline">Reassess</span></strong></li></ul></div>');
+    expect(html('[fade][underline]Clear[/underline] ==point==[/fade]')).toContain('<span class="text-fade"><span class="text-underline">Clear</span> <mark>point</mark></span>');
+  });
+  it('leaves unsupported, loose, mismatched and multiline effect tags literal',()=>{
+    for(const text of ['[marker]unclosed','[marker]x[/fade]','[glow]x[/glow]','[FADE]x[/FADE]','[fade] spaced [/fade]','[marker][/marker]','[fade]first\nsecond[/fade]']){
+      expect(html(text)).toBe(`<div class="body"><p>${text}</p></div>`);
+    }
+    expect(html('[marker]<script>alert(1)</script>[/marker]')).toContain('<mark class="text-marker">&lt;script&gt;alert(1)&lt;/script&gt;</mark>');
+  });
 });

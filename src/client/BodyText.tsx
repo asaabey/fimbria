@@ -1,13 +1,15 @@
 import type {ReactNode} from 'react';
 
 // Inline emphasis: **bold** and ==highlight==. The markers must hug the text ("a == b" stays literal),
-// unmatched markers stay as typed, and either may contain the other. Output is React elements, never HTML.
-const inline=/\*\*(?=\S)(.+?)(?<=\S)\*\*|==(?=\S)(.+?)(?<=\S)==/g;
+// unmatched markers stay as typed. Named [marker], [underline] and [fade] pairs add text effects.
+// Different markers can nest. Output is React elements, never HTML.
+const inline=/\*\*(?=\S)(.+?)(?<=\S)\*\*|==(?=\S)(.+?)(?<=\S)==|\[(marker|underline|fade)\](?=\S)(.+?)(?<=\S)\[\/\3\]/g;
 export function emphasis(text:string):ReactNode[]{
   const out:ReactNode[]=[];let last=0;
   for(const m of text.matchAll(inline)){
     if(m.index>last)out.push(text.slice(last,m.index));
-    out.push(m[1]!==undefined?<strong key={m.index}>{emphasis(m[1])}</strong>:<mark key={m.index}>{emphasis(m[2])}</mark>);
+    const content=emphasis(m[1]??m[2]??m[4]);
+    out.push(m[1]!==undefined?<strong key={m.index}>{content}</strong>:m[2]!==undefined?<mark key={m.index}>{content}</mark>:m[3]==='marker'?<mark className="text-marker" key={m.index}>{content}</mark>:<span className={`text-${m[3]}`} key={m.index}>{content}</span>);
     last=m.index+m[0].length;
   }
   if(last<text.length)out.push(text.slice(last));

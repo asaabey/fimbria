@@ -49,6 +49,55 @@ What this means for authors:
   highlighted. Don't add a blank line between list items. Titles, prompts
   and options are always plain.
 
+## Animated text markup
+
+Use these paired tags inside slide `body` and question `explanation` strings:
+
+| Markup | Effect in a live lesson | Final appearance |
+| --- | --- | --- |
+| `[marker]key words[/marker]` | Highlighter colour sweeps beneath the words | Highlighted text |
+| `[underline]key words[/underline]` | An underline draws beneath the words | Underlined text |
+| `[fade]short phrase[/fade]` | Text fades in and rises gently into place | Ordinary text |
+
+Each effect plays **once per appearance** on teacher, presentation and student
+screens. Returning to a step plays its effects again; votes and participant
+updates do not restart them. An explanation plays its effects when the teacher
+reveals it. Playback is local to each screen, so a late joiner sees the entrance
+when they join, rather than a synchronized animation timeline.
+
+Preview, handout/PDF and reduced-motion mode show the final readable style
+without animation. Marker and underline colours follow the selected theme.
+Keep fade phrases short: they form an inline block that may move to the next
+line. Prefer just one or two effects per slide.
+
+Tags are lowercase, must touch their content and close on the **same line**.
+They work in list items and can wrap bold or static highlight markup, e.g.
+`[marker]Notice the **key evidence**.[/marker]`. Do not nest a tag inside itself
+or cross pairs. Unknown, incomplete or mismatched tags remain literal text.
+These tags do not enable HTML or arbitrary CSS. Titles, question prompts,
+answer options, captions and table cells remain plain text.
+
+This complete JSON example is ready to upload (no new schema fields needed):
+
+```json
+{
+  "schemaVersion": 1,
+  "id": "text-effects-intro",
+  "title": "A little emphasis",
+  "steps": [
+    {
+      "id": "intro",
+      "type": "slide",
+      "title": "Pause. Gather. Reassess.",
+      "body": "[fade]Take a moment before deciding.[/fade]\n- [marker]Notice the **key evidence**.[/marker]\n- [underline]Consider another explanation.[/underline]"
+    }
+  ]
+}
+```
+
+The repository also includes `examples/text-effects.json` with a slide and a
+question explanation demonstrating all three effects.
+
 ## File structure
 
 ```json
@@ -89,7 +138,7 @@ Every step needs an `id` (1-100 characters, **unique within the lesson**) and a 
 | Field | Required | Rules |
 |-------|----------|-------|
 | `title` | yes | 1-200 characters |
-| `body` | yes | 0-10,000 characters of plain text; line breaks are kept, `- ` / `1. ` lines become lists, `**bold**` and `==highlight==` work |
+| `body` | yes | 0-10,000 characters of plain text; line breaks are kept, `- ` / `1. ` lines become lists, `**bold**`, `==highlight==` and the animated text markup above work |
 | `image` | no | See [Images](#images) |
 | `table` | no | See [Tables](#tables). Shown under the body |
 

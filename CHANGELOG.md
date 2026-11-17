@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Paired `[marker]`, `[underline]` and `[fade]` text markup in lesson bodies and explanations, with one-time classroom animation, static preview/handout and reduced-motion styles, authoring docs and an uploadable example.
+
 - Teachers can jump directly to a numbered slide, video or question from Session controls, updating every screen while preserving recorded answers and revealed results.
 - Teacher session screen: a running current-time clock and session timer in the top bar (the timer starts at Begin lesson, uses the server's clock and freezes at the end), and the room code with a join QR pinned to the lower right during the lesson. Rooms record `started` and `ended` times.
 - Teachers can end unfinished sessions from the home page, one at a time or all at once, after confirming (`POST /api/rooms/:id/end`, `POST /api/rooms/end-all`). The list now shows each session's lesson, step, students and last activity.

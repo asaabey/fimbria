@@ -97,6 +97,23 @@ button:hover:not(:disabled) { filter: brightness(.92); }
 .body li::marker { color: var(--accent); }
 .body strong { font-weight: 700; color: var(--text); }
 .body mark { background: var(--highlight); color: var(--on-highlight); padding: 0 .2em; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+/* Text effects settle to these static styles in previews and handouts. */
+.body mark.text-marker { background: linear-gradient(var(--highlight), var(--highlight)) 0 85% / 100% 70% no-repeat; }
+.body .text-underline { background: linear-gradient(var(--accent), var(--accent)) 0 100% / 100% 2px no-repeat; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.body .text-fade { display: inline-block; max-width: 100%; vertical-align: baseline; }
+.in-room .body .text-marker { animation: text-marker-sweep .9s ease-out both; }
+.in-room .body .text-underline { animation: text-underline-draw .75s ease-out both; }
+.in-room .body .text-fade { animation: text-fade-rise .6s ease-out both; }
+@keyframes text-marker-sweep { from { background-size: 0% 70%; } to { background-size: 100% 70%; } }
+@keyframes text-underline-draw { from { background-size: 0% 2px; } to { background-size: 100% 2px; } }
+@keyframes text-fade-rise { from { opacity: 0; transform: translateY(.35em); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .in-room .body .text-marker, .in-room .body .text-underline, .in-room .body .text-fade { animation: none; }
+}
+@media print {
+  .in-room .body .text-marker, .in-room .body .text-underline, .in-room .body .text-fade { animation: none; }
+  .body .text-marker, .body .text-underline { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
 .body > :last-child { margin-bottom: 0; }
 .body { margin: 0 0 1em; }
 .body.compact { font-size: .9rem; line-height: 1.5; margin: 8px 0; }

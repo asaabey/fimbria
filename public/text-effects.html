@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An isolated playground for CSS text effects in Fimbria.">
+  <title>Text effects · Fimbria lab</title>
+  <style>
+    :root { font-family: 'Avenir Next', Avenir, 'Segoe UI', sans-serif; color: #243832; background: #f5f7f5; --accent: #235e50; --duration: 1.8s; --repeat: 1; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { max-width: 1240px; margin: auto; padding: 28px 32px 64px; }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 24px; border-bottom: 1px solid #d7e0da; }
+    a { color: var(--accent); text-underline-offset: 4px; }
+    .brand { font: 600 1.7rem Georgia, serif; letter-spacing: -.04em; text-decoration: none; }
+    .eyebrow { color: #586b63; text-transform: uppercase; font-size: .75rem; letter-spacing: .14em; }
+    .intro { max-width: 720px; padding: 30px 0 20px; }
+    h1, h2 { font-family: Georgia, serif; font-weight: 400; }
+    h1 { font-size: clamp(2.5rem, 6vw, 4rem); letter-spacing: -.045em; margin: 12px 0; }
+    p { line-height: 1.65; }
+    .muted { color: #586b63; }
+    .controls { padding: 22px; border: 1px solid #d7e0da; background: #fff; border-radius: 12px; margin-bottom: 24px; }
+    label { font-size: .85rem; font-weight: 600; }
+    input[type=text], select { font: inherit; color: inherit; background: #fff; border: 1px solid #81958a; border-radius: 6px; padding: 12px; min-width: 0; }
+    input[type=text] { display: block; width: 100%; margin: 8px 0 18px; }
+    .control-row { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 22px; }
+    .control-row label { display: flex; align-items: center; gap: 8px; }
+    input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); }
+    button { font: inherit; font-weight: 600; padding: 10px 16px; min-height: 44px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: white; cursor: pointer; }
+    button.secondary { color: var(--accent); background: white; }
+    :focus-visible { outline: 3px solid #956018; outline-offset: 3px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    article { min-width: 0; padding: 24px; border: 1px solid #d7e0da; border-radius: 12px; background: #fff; }
+    .card-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    h2 { font-size: 1.35rem; margin: 0; }
+    .replay { color: var(--accent); background: transparent; padding: 4px 8px; border: 0; font-size: .8rem; }
+    .stage { display: flex; align-items: center; min-height: 146px; padding: 24px 12px; margin: 16px 0; background: #f1f5f1; border-radius: 8px; overflow: hidden; }
+    .sample { font-size: clamp(1.3rem, 2.3vw, 1.8rem); font-weight: 600; line-height: 1.45; overflow-wrap: anywhere; }
+    article p { font-size: .85rem; margin: 10px 0 0; color: #586b63; }
+    code { font-size: .8rem; color: #235e50; overflow-wrap: anywhere; }
+    .tag { display: inline-block; font-size: .7rem; border-radius: 20px; padding: 4px 9px; background: #e8eee8; color: #235e50; margin-top: 14px; }
+    .note { font-size: .85rem; }
+    .sample, .sample span { animation-duration: var(--duration); animation-iteration-count: var(--repeat); animation-fill-mode: both; }
+    .marker { background: linear-gradient(#fbe7a1, #fbe7a1) 0 85% / 100% 55% no-repeat; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+    .run .marker { animation-name: marker; }
+    @keyframes marker { from { background-size: 0% 55%; } to { background-size: 100% 55%; } }
+    .underline { text-decoration: none; background: linear-gradient(#235e50, #235e50) 0 100% / 100% 3px no-repeat; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+    .run .underline { animation-name: underline; }
+    @keyframes underline { from { background-size: 0% 3px; } to { background-size: 100% 3px; } }
+    .run .fade { animation-name: fade; }
+    @keyframes fade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .run .focus { animation-name: focus; }
+    @keyframes focus { from { opacity: 0; filter: blur(8px); } to { opacity: 1; filter: blur(0); } }
+    .run .pop { animation-name: pop; }
+    @keyframes pop { 0% { transform: scale(.85); opacity: 0; } 65% { transform: scale(1.04); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+    .run .typewriter { animation-name: typewriter; animation-timing-function: steps(var(--characters, 30), end); }
+    @keyframes typewriter { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
+    .gradient { color: #235e50; }
+    @supports (background-clip: text) or (-webkit-background-clip: text) {
+      .gradient { background: linear-gradient(100deg, #235e50 10%, #79601f 35%, #694293 60%, #235e50 90%); background-size: 250% 100%; background-clip: text; -webkit-background-clip: text; color: transparent; }
+      .run .gradient { animation-name: gradient; }
+    }
+    @keyframes gradient { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+    .run .glow { animation-name: glow; }
+    @keyframes glow { 0%, 100% { text-shadow: none; } 50% { text-shadow: 0 0 14px #65aa88aa, 0 0 28px #65aa8877; } }
+    .words span { display: inline-block; animation-delay: calc(var(--i) * .12s); }
+    .run .cascade span { animation-name: fade; }
+    .run .wave span { animation-name: wave; }
+    @keyframes wave { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-10px); } }
+    .paused .sample, .paused .sample span { animation-play-state: paused; }
+    .still .sample, .still .sample span { animation: none !important; }
+    .motion-note { display: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .sample, .sample span { animation: none !important; }
+      .motion-note { display: block; }
+    }
+    @media (max-width: 700px) { main { padding: 20px 16px 40px; } .grid { grid-template-columns: 1fr; } article { padding: 18px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header><a class="brand" href="/">Fimbria</a><span class="eyebrow">Type lab / 01</span></header>
+  <div class="intro">
+    <p class="eyebrow">A little emphasis. A little motion.</p>
+    <h1>Let the words do more.</h1>
+    <p class="muted">Try text treatments for a future lesson. The existing <strong>bold</strong> and <mark style="background:#fbe7a1">highlight</mark> are our starting point; these are experiments in drawing attention over time.</p>
+  </div>
+  <div class="controls" aria-label="Playground controls">
+    <label for="sample-text">Your sample text</label>
+    <input id="sample-text" type="text" value="Pause. Gather. Reassess." maxlength="120">
+    <div class="control-row">
+      <button id="replay-all">Replay all</button>
+      <button id="pause" class="secondary" aria-pressed="false">Pause</button>
+      <label>Speed <select id="speed"><option value="3">Slow</option><option value="1.8" selected>Normal</option><option value=".8">Fast</option></select></label>
+      <label><input id="loop" type="checkbox"> Loop</label>
+      <label><input id="still" type="checkbox"> Still preview</label>
+    </div>
+    <p class="note muted">Each effect plays once by default. Edit the text or replay any card to compare. Animations also respect your device’s reduced-motion setting.</p>
+    <p class="motion-note note">Your device requests reduced motion, so you’re seeing the final, readable styles.</p>
+  </div>
+  <div class="grid" id="effects"></div>
+  <footer><p class="note muted">Standalone HTML + CSS. Small JavaScript controls the previews; CSS runs every animation. These effects have not been added to lesson markup.</p><p class="note"><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Animations/Using">How CSS animations work</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion">Reduced-motion support</a></p></footer>
+</main>
+<script>
+  const effects = [
+    ['marker', 'Marker sweep', 'A highlight grows under the text, then stays put. Works well for one key phrase.', 'background-size', 'Try in lessons'],
+    ['underline', 'Underline draw', 'A line draws beneath a phrase. A quieter alternative to a filled highlight.', 'background-size', 'Try in lessons'],
+    ['fade', 'Fade & rise', 'Text gently appears and settles into place. Useful when a new slide begins.', 'opacity + transform', 'Try in lessons'],
+    ['focus', 'Blur to focus', 'A soft blur resolves into sharp text. Best for a short heading.', 'filter + opacity', 'Entrance'],
+    ['cascade words', 'Word cascade', 'Words appear in sequence. Each word needs its own span and a staggered delay.', 'opacity + transform + animation-delay', 'Entrance'],
+    ['typewriter', 'Stepped reveal', 'A typewriter-like wipe. Most convincing on one short line; wrapped lines reveal together.', 'clip-path + steps()', 'Reveal'],
+    ['pop', 'Soft pop', 'A small overshoot brings a heading into view, then settles at its original size.', 'transform: scale()', 'Entrance'],
+    ['gradient', 'Gradient drift', 'Colour moves through the letter shapes. The final gradient remains visible.', 'background-clip: text + background-position', 'Decorative'],
+    ['glow', 'Soft glow', 'A halo grows and fades without hiding the letters. Try sparingly on key words.', 'text-shadow', 'Decorative'],
+    ['wave words', 'Word wave', 'Each word lifts in turn. Each needs its own span; better for playful moments.', 'transform + animation-delay', 'Decorative'],
+  ];
+  const grid = document.querySelector('#effects');
+  const input = document.querySelector('#sample-text');
+  let paused = false;
+  function replay(card) {
+    card.classList.remove('run');
+    void card.offsetWidth;
+    card.classList.add('run');
+  }
+  function replayAll() { grid.querySelectorAll('article').forEach(replay); }
+  for (const [className, title, description, technique, tag] of effects) {
+    const card = document.createElement('article');
+    const heading = document.createElement('div');
+    heading.className = 'card-heading';
+    const name = document.createElement('h2');
+    name.textContent = title;
+    const button = document.createElement('button');
+    button.className = 'replay';
+    button.textContent = 'Replay ↻';
+    button.setAttribute('aria-label', 'Replay ' + title);
+    button.addEventListener('click', () => replay(card));
+    heading.append(name, button);
+    const stage = document.createElement('div');
+    stage.className = 'stage';
+    const sample = document.createElement('div');
+    sample.className = 'sample ' + className;
+    stage.append(sample);
+    const badge = document.createElement('span');
+    badge.className = 'tag';
+    badge.textContent = tag;
+    const detail = document.createElement('p');
+    detail.textContent = description;
+    const code = document.createElement('code');
+    code.textContent = technique;
+    card.append(heading, stage, badge, detail, code);
+    grid.append(card);
+  }
+  function updateText() {
+    const text = input.value || 'Pause. Gather. Reassess.';
+    grid.querySelectorAll('.sample').forEach(sample => {
+      sample.replaceChildren();
+      sample.style.setProperty('--characters', String(text.length));
+      if (sample.classList.contains('words')) {
+        sample.setAttribute('aria-label', text);
+        text.split(/\s+/).filter(Boolean).forEach((word, index) => {
+          if (index) sample.append(' ');
+          const span = document.createElement('span');
+          span.textContent = word;
+          span.setAttribute('aria-hidden', 'true');
+          span.style.setProperty('--i', String(index));
+          sample.append(span);
+        });
+      } else sample.textContent = text;
+    });
+    replayAll();
+  }
+  input.addEventListener('input', updateText);
+  document.querySelector('#replay-all').addEventListener('click', replayAll);
+  document.querySelector('#pause').addEventListener('click', event => {
+    paused = !paused;
+    grid.classList.toggle('paused', paused);
+    event.currentTarget.setAttribute('aria-pressed', String(paused));
+    event.currentTarget.textContent = paused ? 'Resume' : 'Pause';
+  });
+  document.querySelector('#speed').addEventListener('change', event => {
+    document.documentElement.style.setProperty('--duration', event.target.value + 's');
+    replayAll();
+  });
+  document.querySelector('#loop').addEventListener('change', event => {
+    document.documentElement.style.setProperty('--repeat', event.target.checked ? 'infinite' : '1');
+    replayAll();
+  });
+  document.querySelector('#still').addEventListener('change', event => {
+    grid.classList.toggle('still', event.target.checked);
+    replayAll();
+  });
+  updateText();
+</script>
+</body>
+</html>

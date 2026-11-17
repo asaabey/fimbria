@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "text-effects-demo",
+  "title": "A little emphasis",
+  "steps": [
+    {
+      "id": "effects",
+      "type": "slide",
+      "title": "Pause. Gather. Reassess.",
+      "body": "[fade]Take a moment before deciding.[/fade]\n- [marker]Notice the **key evidence**.[/marker]\n- [underline]Consider another explanation.[/underline]\n- Keep ==uncertainty== in view."
+    },
+    {
+      "id": "practice",
+      "type": "question",
+      "prompt": "Which habit helps you reconsider an assumption?",
+      "options": [
+        {"id": "a", "text": "Look for an alternative explanation"},
+        {"id": "b", "text": "Ignore new evidence"}
+      ],
+      "correctOptionId": "a",
+      "explanation": "[fade]Make room for another possibility.[/fade] [marker]Review the evidence[/marker] and [underline]reassess your first impression[/underline]."
+    }
+  ]
+}
