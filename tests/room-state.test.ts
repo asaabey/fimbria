@@ -7,6 +7,43 @@ import {mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 describe('durable rooms',()=>{
+  it('validates jumps and preserves answers, closed questions and revealed results',()=>{
+    const store=new Store(':memory:');
+    try{
+      const room=store.create(store.lesson(parseLesson(fixture)));
+      const participant=store.join(store.snapshot(room).code);
+      expect(()=>store.action(room,'JUMP',2)).toThrow('Start the lesson first');
+      store.action(room,'START');
+      const initial=store.snapshot(room,true);
+      expect(initial.navigation).toEqual(fixture.steps.map((step,index)=>({index,title:step.type==='question'?step.prompt:step.title})));
+      expect(store.snapshot(room)).not.toHaveProperty('navigation');
+      for(const index of [undefined,-1,fixture.steps.length,1.5,NaN,'2',null]){
+        expect(()=>store.action(room,'JUMP',index as number)).toThrow('Invalid slide index');
+        expect(store.snapshot(room).revision).toBe(initial.revision);
+      }
+      store.action(room,'JUMP',2);
+      const question=store.snapshot(room);
+      expect(question).toMatchObject({index:2,phase:'ACTIVE',closed:false});
+      expect(()=>store.vote(room,participant.credential,'q1','a',initial.revision)).toThrow('changed');
+      store.vote(room,participant.credential,'q1','a',question.revision);
+      store.action(room,'JUMP',2);
+      expect(store.snapshot(room)).toMatchObject({revision:question.revision,closed:false});
+      store.action(room,'JUMP',5);
+      store.action(room,'JUMP',2);
+      expect(store.snapshot(room,false,participant.credential)).toMatchObject({answer:'a',closed:true});
+      const late=store.join(store.snapshot(room).code);
+      expect(()=>store.vote(room,late.credential,'q1','a',store.snapshot(room).revision)).toThrow('closed');
+      store.action(room,'REVEAL');
+      store.action(room,'JUMP',0);
+      store.action(room,'JUMP',2);
+      expect(store.snapshot(room)).toMatchObject({phase:'REVEALED',totals:{a:1},step:{correctOptionId:'a'}});
+      expect(store.snapshot(room).startedAt).toBe(initial.startedAt);
+      store.action(room,'JUMP',3);
+      expect(store.snapshot(room)).toMatchObject({phase:'ACTIVE',closed:false});
+      store.action(room,'END');
+      expect(()=>store.action(room,'JUMP',0)).toThrow('ended');
+    }finally{store.db.close();}
+  });
   it('restores a consistent online backup',async()=>{
     const dir=mkdtempSync(join(tmpdir(),'backup-'));
     const source=new Store(join(dir,'source.sqlite'));

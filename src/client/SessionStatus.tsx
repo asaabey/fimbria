@@ -46,7 +46,7 @@ export function SessionClock({startedAt,endedAt,serverNow}:{startedAt?:number;en
   </>;
 }
 
-// Room code and QR code for latecomers, pinned to the lower right of the teacher's screen.
+// Room code and QR code for latecomers, below the session controls on the teacher's screen.
 export function JoinCorner({qr,code,joinUrl}:{qr:string;code:string;joinUrl:string}){
   const url=new URL(joinUrl);
   return <aside className="join-corner" aria-label="Join this class">

@@ -39,7 +39,7 @@ export class Store {
     return {id:room.id,credential:token};
   }
   verify(id:string,token:string){if(!this.db.prepare('SELECT token FROM participants WHERE room=? AND token=?').get(id,token))throw new Error('Join the room first');}
-  action(id:string,action:Action){
+  action(id:string,action:Action,targetIndex?:number){
     const r=this.room(id), lesson:Lesson=JSON.parse(r.lesson);
     if(r.phase==='ENDED')throw new Error('Session has ended');
     let index=r.idx,phase=r.phase;
@@ -52,6 +52,12 @@ export class Store {
     }else{
       if(action==='START'){if(index!==-1)throw new Error('Already started');index=0;}
       else if(action==='NEXT'){if(index<0||index>=lesson.steps.length-1)throw new Error('Cannot advance');index++;}
+      else if(action==='JUMP'){
+        if(index<0)throw new Error('Start the lesson first');
+        if(typeof targetIndex!=='number'||!Number.isInteger(targetIndex)||targetIndex<0||targetIndex>=lesson.steps.length)throw new Error('Invalid slide index');
+        index=targetIndex;
+        if(index===r.idx)return;
+      }
       else if(action==='PREVIOUS'){if(index<=0)throw new Error('Cannot go back');index--;}
       else throw new Error('Unknown action');
       if(r.idx>=0 && index!==r.idx && !closed.includes(lesson.steps[r.idx].id))closed.push(lesson.steps[r.idx].id);
@@ -87,7 +93,7 @@ export class Store {
     const rows=source?this.db.prepare('SELECT option,COUNT(*) AS n FROM answers WHERE room=? AND question=? GROUP BY option').all(r.id,source.id):[];
     const totals=Object.fromEntries(rows.map(row=>[row.option,Number(row.n)]));
     const base:Snapshot={id:r.id,code:r.code,title:lesson.title,phase:r.phase,revision:r.revision,index:r.idx,stepCount:lesson.steps.length,step,participants:Number(this.db.prepare('SELECT COUNT(*) AS n FROM participants WHERE room=?').get(r.id)!.n),closed:r.phase!=='ACTIVE'||!!source&&JSON.parse(r.closed).includes(source.id),totals:revealed?totals:undefined,joinUrl:`${this.baseUrl}/join?code=${r.code}`,startedAt:r.started??undefined,endedAt:r.ended??undefined,serverNow:Date.now()};
-    const teacher:Snapshot={...base,responses:rows.reduce((n,row)=>n+Number(row.n),0)};
+    const teacher:Snapshot={...base,navigation:lesson.steps.map((step,index)=>({index,title:step.type==='question'?step.prompt:step.title})),responses:rows.reduce((n,row)=>n+Number(row.n),0)};
     let answers:Map<string,string>|undefined;
     const answerOf=(token:string)=>{
       if(!source)return undefined;

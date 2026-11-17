@@ -165,7 +165,12 @@ li p { margin: 6px 0; }
 .session-grid > section { margin: 0; min-width: 0; }
 .session-grid h2 { margin-top: 0; }
 .teacher-session .session-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
-.teacher-controls { position: sticky; top: 24px; padding: 24px; }
+.teacher-sidebar { position: sticky; top: 24px; display: grid; gap: 16px; min-width: 0; }
+.teacher-controls { padding: 24px; margin: 0; min-width: 0; }
+.slide-navigation { margin-top: 20px; }
+.slide-navigation label { margin-bottom: 12px; font-size: .9rem; }
+.slide-navigation select { text-overflow: ellipsis; }
+.slide-navigation button { width: 100%; }
 .teacher-controls h2 { font-size: 1.3rem; }
 .teacher-controls p { font-weight: 600; }
 .teacher-controls a { font-size: .9rem; }
@@ -191,6 +196,7 @@ li p { margin: 6px 0; }
 @media (max-width: 900px) {
   .preparation-grid { grid-template-columns: 1fr; }
   .teacher-session .session-grid { grid-template-columns: minmax(0, 1fr); }
+  .teacher-sidebar { display: contents; }
   .teacher-controls { position: sticky; top: auto; bottom: 12px; box-shadow: 0 6px 24px #0002; }
   .teacher-controls nav { display: flex; margin-top: 12px; }
   .teacher-controls h2 { display: none; }
@@ -290,13 +296,12 @@ li p { margin: 6px 0; }
 .session-time.stopped .status-icon { color: var(--muted); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 /* Join corner (teacher screen only): room code and QR for latecomers when the teacher's screen is projected. */
-.join-corner { position: fixed; right: 16px; bottom: 16px; z-index: 10; display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 6px 24px #0002; }
+.join-corner { display: flex; min-width: 0; align-items: center; gap: 12px; padding: 10px 14px 10px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 6px 24px #0002; }
 .join-corner img { display: block; width: 104px; height: 104px; border-radius: 4px; background: #fff; }
-.join-corner div { display: flex; flex-direction: column; gap: 2px; }
+.join-corner div { min-width: 0; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 2px; }
 .join-label { font-size: .8rem; color: var(--muted); }
 .join-code { font-size: 1.9rem; letter-spacing: .08em; font-variant-numeric: tabular-nums; line-height: 1.1; }
-.teacher-session.in-room { padding-bottom: 160px; }
-@media (max-width: 900px) { .teacher-session .join-corner { display: none; } .teacher-session.in-room { padding-bottom: 24px; } }
+@media (max-width: 900px) { .teacher-session .join-corner { display: none; } }
 .room-badge strong { color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
 .reconnecting { margin: 0 0 12px; padding: 8px 12px; border-radius: 6px; font-size: .9rem; color: var(--error-text); background: var(--error-background); }
 .title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px 32px; margin: 4px 0 16px; }

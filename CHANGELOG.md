@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Teachers can jump directly to a numbered slide, video or question from Session controls, updating every screen while preserving recorded answers and revealed results.
 - Teacher session screen: a running current-time clock and session timer in the top bar (the timer starts at Begin lesson, uses the server's clock and freezes at the end), and the room code with a join QR pinned to the lower right during the lesson. Rooms record `started` and `ended` times.
 - Teachers can end unfinished sessions from the home page, one at a time or all at once, after confirming (`POST /api/rooms/:id/end`, `POST /api/rooms/end-all`). The list now shows each session's lesson, step, students and last activity.
 - `**bold**` and `==highlight==` in slide bodies, explanations and list items, themed for every appearance and kept in handouts.
@@ -30,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Align the teacher's join QR card directly below Session controls in the sticky sidebar instead of floating in the lower right corner.
 - Joins and votes update only the teacher's screen and the voter's own, and broadcasts build each view once per room with the lesson parsed once. One room now serves about 1,000 students with votes accepted in under 0.3 s (p95), up from about 200. Added `scripts/load-test.mjs`, a staged ramp load test.
 - Session screens use a compact top bar holding a plug connection indicator (unplugged and red while reconnecting) and the room code, with a step progress bar beside the lesson title, so the lesson starts higher on the screen.
 - Teacher login attempts per minute are configurable with `LOGIN_ATTEMPTS_PER_MINUTE` (default 10).

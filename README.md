@@ -47,7 +47,7 @@ The setup command replaces the only teacher password and revokes all teacher coo
 Socket.IO events use acknowledged replies `{ok:true,data}` or `{ok:false,error}`:
 
 - `join_room {roomId, role?, credential?}`: room code or internal ID; role is teacher, display, or student (default). Returns credential and state. Save the credential privately per room.
-- `host_action {action}`: START, NEXT, PREVIOUS, REVEAL, END; requires a teacher cookie and teacher join.
+- `host_action {action, index?}`: START, NEXT, PREVIOUS, REVEAL, END, JUMP; JUMP requires an integer zero-based `index` within the lesson and a started, unended session; requires a teacher cookie and teacher join.
 - `submit_vote {questionId, optionId, revision}`: uses joined room and credential, validates the current revision, records once before acknowledgement. Identical retries return the saved answer.
 - `room_state_update`: individualized snapshot, with private answer status and teacher-only response counts. Correct answer, explanation and totals are published only after reveal.
 
@@ -114,7 +114,7 @@ The server only downloads from raw.githubusercontent.com over HTTPS, rejects red
 
 To remove a saved lesson, choose it, click **Delete lesson** in the preview and confirm. Deletion removes it from the saved list only: sessions already started from it keep their own copy and stay resumable. API (teacher login required): `DELETE /api/lessons/:id` returns `{ok:true}`, or 404 if the lesson does not exist.
 
-During a session the teacher's screen shows the current time and a running session timer in the top bar (the timer starts at **Begin lesson** and stops when the session ends), and the room code with a join QR in the lower right corner, for latecomers when the teacher's screen is projected. The presentation display and student phones do not show these.
+During a session the teacher's screen shows the current time and a running session timer in the top bar (the timer starts at **Begin lesson** and stops when the session ends), and the room code with a join QR aligned directly below Session controls, for latecomers when the teacher's screen is projected. The QR card is hidden at widths of 900 px and below. The presentation display and student phones do not show these. Session controls include a numbered “Jump to slide” picker with titles for slides, videos and questions; choose a destination and press “Go to slide” to update all screens. Jumping preserves answers and reveal state; leaving a question closes it permanently, just like Next/Previous. Teacher snapshots include `navigation` entries (`index`, `title`); student and display snapshots omit them.
 
 Unended sessions appear under **Unfinished sessions** on the teacher page, with the lesson title, current step, student count and last activity. **End** (or **End all**) ends them after an inline confirmation, exactly like **End session** in the controls: connected screens show "Session complete", answers are kept, and students can then download the handout. Sessions with no activity for `SESSION_TTL_HOURS` also end automatically. API (teacher login required): `GET /api/rooms`, `POST /api/rooms/:id/end` (404 unknown, 409 already ended) and `POST /api/rooms/end-all` (returns `{ended}`).
 

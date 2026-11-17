@@ -43,7 +43,26 @@ test('session top bar shows connection and room, and a progress bar tracks the s
     await expect(corner).toContainText(code);
     await expect(corner.getByRole('img',{name:`QR code to join room ${code}`})).toBeVisible();
     const box=(await corner.boundingBox())!;
-    expect(box.x+box.width).toBeGreaterThan(1366-40);expect(box.y+box.height).toBeGreaterThan(900-40);
+    const controls=(await page.getByRole('region',{name:'Session controls'}).boundingBox())!;
+    expect(box.x).toBeCloseTo(controls.x,0);
+    expect(box.width).toBeCloseTo(controls.width,0);
+    expect(box.y-controls.y-controls.height).toBeCloseTo(16,0);
+    await page.setViewportSize({width:800,height:900});
+    await expect(corner).toBeHidden();
+    await page.setViewportSize({width:1366,height:900});
+    // Jumping updates every screen, and normal navigation keeps the picker in sync.
+    const picker=page.getByLabel('Jump to slide');
+    await expect(picker).toHaveValue('1');
+    await expect(page.getByRole('button',{name:'Go to slide',exact:true})).toBeDisabled();
+    await picker.selectOption('4');
+    await page.getByRole('button',{name:'Go to slide',exact:true}).click();
+    for(const screen of [page,display,student])await expect(screen.getByRole('progressbar',{name:'Lesson progress'})).toHaveAttribute('aria-valuenow','5');
+    await page.getByRole('button',{name:'Previous',exact:true}).click();
+    await expect(picker).toHaveValue('3');
+    await picker.selectOption('0');
+    await page.getByRole('button',{name:'Go to slide',exact:true}).click();
+    for(const screen of [page,display,student])await expect(screen.getByRole('progressbar',{name:'Lesson progress'})).toHaveAttribute('aria-valuenow','1');
+    await expect(page.getByRole('button',{name:'Previous',exact:true})).toBeDisabled();
     for(const screen of [display,student]){
       await expect(screen.locator('header .status-badge')).toHaveCount(0);
       await expect(screen.locator('.join-corner')).toHaveCount(0);
@@ -60,6 +79,7 @@ test('session top bar shows connection and room, and a progress bar tracks the s
     await page.getByRole('button',{name:'End session'}).click();
     await expect(page.locator('header .session-time')).toHaveClass(/stopped/);
     await expect(page.locator('.join-corner')).toHaveCount(0);
+    await expect(page.getByLabel('Jump to slide')).toHaveCount(0);
     const frozen=await elapsed.textContent();
     await page.waitForTimeout(1500);
     await expect(elapsed).toHaveText(frozen!);

@@ -98,7 +98,7 @@ io.on('connection',socket=>{
   });
   handle('host_action',data=>{
     if(!socket.data.teacher||!authorized(socket.handshake.headers.cookie))throw new Error('Teacher login required');
-    store.action(socket.data.room,data.action);broadcast(socket.data.room);return store.snapshot(socket.data.room,true);
+    store.action(socket.data.room,data.action,data.index);broadcast(socket.data.room);return store.snapshot(socket.data.room,true);
   });
   handle('submit_vote',data=>{
     if(!socket.data.credential)throw new Error('Join first');
