@@ -7,6 +7,18 @@ and this project uses calendar versioning (`YYYY.MM.DD`).
 
 ## [Unreleased]
 
+## [2026.11.18-2] - 2026-11-18
+
+### Fixed
+
+- Wrap teacher status badges onto a second row on phones to prevent horizontal scrolling.
+- Keep Sign out compact in the teacher header, removing the legacy float and negative margin that stretched it across the page and overlapped the heading.
+
+### Changed
+
+- Compact teacher controls with icon participant/response counters, an accessible PDF icon, an inline slide picker and no heading or projector link.
+- Enable left/right arrow navigation in running teacher sessions, preserving input, dropdown and media keyboard behavior.
+
 ## [2026.11.18] - 2026-11-18
 
 ### Added

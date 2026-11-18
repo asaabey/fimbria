@@ -18,7 +18,7 @@ test('YouTube links embed in preview and all classroom views with a fallback lin
   await page.getByRole('button',{name:'Start session',exact:true}).click();
   await expect(page.getByText('Ready when you are.')).toBeVisible();
   const display=await context.newPage();
-  await display.goto((await page.getByRole('link',{name:'Open presentation display ↗'}).getAttribute('href'))!);
+  await display.goto(page.url().replace('/host/','/display/'));
   const studentContext=await browser.newContext({viewport:{width:375,height:812}});
   try {
     await studentContext.route('https://www.youtube.com/embed/**',route=>route.fulfill({contentType:'text/html',body:'<p>YouTube player fixture</p>'}));
@@ -66,7 +66,7 @@ test('MP4 plays in preview and classroom, stops on navigation, and reports missi
   await page.getByRole('button',{name:'Start session',exact:true}).click();
   await expect(page.getByText('Ready when you are.')).toBeVisible();
   const display=await context.newPage();
-  await display.goto((await page.getByRole('link',{name:'Open presentation display ↗'}).getAttribute('href'))!);
+  await display.goto(page.url().replace('/host/','/display/'));
   const studentContext=await browser.newContext({viewport:{width:375,height:812}});
   try {
     await studentContext.route('**/media/test-video.mp4',route=>route.fulfill({contentType:'video/mp4',body:media}));

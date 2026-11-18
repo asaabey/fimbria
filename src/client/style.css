@@ -167,7 +167,8 @@ li p { margin: 6px 0; }
 .teacher-home header, .teacher-session header { padding-bottom: 20px; }
 .teacher-home h1 { margin: 8px 0; font-size: 2.4rem; }
 .teacher-home h1 + p { margin: 8px 0 16px; }
-.sign-out { float: right; margin-top: -60px; }
+.teacher-home .header-tools { flex-wrap: wrap; gap: 12px 20px; }
+.sign-out { flex: 0 0 auto; min-height: 44px; padding: 8px 14px; }
 .preparation-grid { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 24px; }
 .preparation-grid > section { margin: 0; padding: 24px; min-width: 0; }
 .preparation-grid h2 { margin-top: 0; }
@@ -210,17 +211,21 @@ li p { margin: 6px 0; }
 .session-grid h2 { margin-top: 0; }
 .teacher-session .session-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
 .teacher-sidebar { position: sticky; top: 24px; display: grid; gap: 16px; min-width: 0; }
-.teacher-controls { padding: 24px; margin: 0; min-width: 0; }
-.slide-navigation { margin-top: 20px; }
-.slide-navigation label { margin-bottom: 12px; font-size: .9rem; }
-.slide-navigation select { text-overflow: ellipsis; }
-.slide-navigation button { width: 100%; }
-.teacher-controls h2 { font-size: 1.3rem; }
-.teacher-controls p { font-weight: 600; }
-.teacher-controls a { font-size: .9rem; }
-.teacher-controls nav { display: grid; grid-template-columns: 1fr 1fr; }
-.teacher-controls nav button { padding: 12px 8px; }
+.teacher-controls { padding: 16px; margin: 0; min-width: 0; }
+.control-icon { flex-shrink: 0; }
+.controls-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.session-metrics { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; min-width: 0; }
+.session-metric { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.session-metric strong { color: var(--text); }
+.icon-button { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 44px; min-height: 44px; padding: 10px; border: 1px solid var(--input-border); border-radius: 5px; }
+.teacher-controls nav { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.teacher-controls nav:empty { display: none; }
+.teacher-controls nav button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 10px 8px; font-size: .85rem; }
+.teacher-controls nav .control-icon { width: 16px; height: 16px; }
 .teacher-controls nav button:nth-child(n+3), .teacher-controls nav button:only-child { grid-column: 1 / -1; }
+.slide-navigation { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.slide-navigation select { flex: 1; width: 0; margin: 0; min-height: 44px; padding: 10px 8px; font-size: .85rem; text-overflow: ellipsis; }
+.teacher-controls .end-session { width: 100%; min-height: 44px; margin-top: 12px; padding: 8px; font-size: .85rem; }
 .teacher-home footer, .teacher-session footer { margin-top: 24px; }
 .teacher-session .options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .teacher-session .options > div { background: var(--answer); padding: 12px 16px; border-radius: 6px; overflow-wrap: anywhere; }
@@ -242,9 +247,6 @@ li p { margin: 6px 0; }
   .teacher-session .session-grid { grid-template-columns: minmax(0, 1fr); }
   .teacher-sidebar { display: contents; }
   .teacher-controls { position: sticky; top: auto; bottom: 12px; box-shadow: 0 6px 24px #0002; }
-  .teacher-controls nav { display: flex; margin-top: 12px; }
-  .teacher-controls h2 { display: none; }
-  .teacher-controls p { margin-top: 0; }
 }
 @media (max-width: 560px) {
   main.student-view, .teacher-home, .teacher-session { padding: 16px; padding-bottom: max(24px, env(safe-area-inset-bottom)); }
@@ -260,7 +262,6 @@ li p { margin: 6px 0; }
   .student-view p { line-height: 1.5; }
   .student-view footer { margin-top: 24px; }
   .student-view .roomCode { font-size: 2.5rem; }
-  .sign-out { float: none; margin: 0 0 16px; }
   .preview-heading { flex-direction: column; }
   .preview-heading button { width: 100%; }
   .preview-actions { width: 100%; }
@@ -364,6 +365,9 @@ li p { margin: 6px 0; }
   .current-time { display: none; }
   .in-room .wordmark { white-space: nowrap; flex-shrink: 0; }
   .status-badge { padding: 4px 8px; }
+  .teacher-session.in-room header { flex-wrap: wrap; }
+  .teacher-session.in-room .session-status { order: 1; flex-basis: 100%; }
+  .teacher-session.in-room .header-tools { margin-left: auto; }
   .connection-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .room-badge { padding: 4px 10px; }
   .title-row { flex-direction: column; align-items: stretch; gap: 8px; }

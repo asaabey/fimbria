@@ -16,7 +16,7 @@ test('formatted question prompts and options preserve voting, results and handou
   const display=await context.newPage();
   const studentContext=await browser.newContext({viewport:{width:375,height:812}});
   try{
-    await display.goto((await page.getByRole('link',{name:'Open presentation display ↗'}).getAttribute('href'))!);
+    await display.goto(page.url().replace('/host/','/display/'));
     const student=await studentContext.newPage();
     await student.goto('/join?code='+code);
     await student.getByRole('button',{name:'Join',exact:true}).click();
@@ -39,7 +39,7 @@ test('formatted question prompts and options preserve voting, results and handou
     await marker.locator('strong').click();
     await expect(student.getByText('Answer submitted and saved.')).toBeVisible();
     await expect(student.getByRole('button',{name:'A. Look for another explanation — Your answer'})).toBeDisabled();
-    await expect(page.getByText('1 participants · 1 responses')).toBeVisible();
+    await expect(page.getByRole('img',{name:'1 responses',exact:true})).toBeVisible();
     expect(await marker.evaluate(el=>el.getAnimations()[0].startTime)).toBe(firstStart);
     await page.getByRole('button',{name:'Reveal results'}).click();
     await expect(display.getByText('1 responses · Correct answer')).toBeVisible();

@@ -13,7 +13,7 @@ test('tables render with headers on every screen and fit phones without page scr
   await expect(page.getByText('Ready when you are.')).toBeVisible();
   const display=await context.newPage();
   await display.setViewportSize({width:1920,height:1080});
-  await display.goto((await page.getByRole('link',{name:'Open presentation display ↗'}).getAttribute('href'))!);
+  await display.goto(page.url().replace('/host/','/display/'));
   const studentContext=await browser.newContext({viewport:{width:375,height:812}});
   try{
     const student=await studentContext.newPage();

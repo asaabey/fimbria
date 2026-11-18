@@ -12,7 +12,7 @@ TEACHER_PASSWORD='choose-a-long-password' npm run teacher
 npm run dev
 ```
 
-Open http://localhost:3000, sign in, upload `examples/intro.json` or import a public GitHub lesson link, preview it, and start a session. Open the presentation link on a projector. Students use /join or the QR link. The teacher home page lists sessions that can be resumed after refresh or restart.
+Open http://localhost:3000, sign in, upload `examples/intro.json` or import a public GitHub lesson link, preview it, and start a session. For a separate projector view, replace `/host/` with `/display/` in the session URL. Students use /join or the QR link. The teacher home page lists sessions that can be resumed after refresh or restart.
 
 ```sh
 npm run lint
@@ -114,7 +114,7 @@ The server only downloads from raw.githubusercontent.com over HTTPS, rejects red
 
 To remove a saved lesson, choose it, click **Delete lesson** in the preview and confirm. Deletion removes it from the saved list only: sessions already started from it keep their own copy and stay resumable. API (teacher login required): `DELETE /api/lessons/:id` returns `{ok:true}`, or 404 if the lesson does not exist.
 
-During a session the teacher's screen shows the current time and a running session timer in the top bar (the timer starts at **Begin lesson** and stops when the session ends), and the room code with a join QR aligned directly below Session controls, for latecomers when the teacher's screen is projected. The QR card is hidden at widths of 900 px and below. The presentation display and student phones do not show these. Session controls include a numbered “Jump to slide” picker with titles for slides, videos and questions; choose a destination and press “Go to slide” to update all screens. Jumping preserves answers and reveal state; leaving a question closes it permanently, just like Next/Previous. Teacher snapshots include `navigation` entries (`index`, `title`); student and display snapshots omit them.
+During a session the teacher's screen shows the current time and a running session timer in the top bar (the timer starts at **Begin lesson** and stops when the session ends), and the room code with a join QR aligned directly below Session controls, for latecomers when the teacher's screen is projected. The QR card is hidden at widths of 900 px and below. The presentation display and student phones do not show these. Session controls use a team icon for participants, a checked speech bubble for responses and a document-download icon for the lesson PDF, with accessible labels and tooltips. Left/right arrow keys move between slides in a running teacher session; shortcuts ignore editable fields, dropdowns, media controls, held keys and modifiers. Session controls include a numbered “Jump to slide” picker with titles for slides, videos and questions; choose a destination and press “Go to slide” to update all screens. Jumping preserves answers and reveal state; leaving a question closes it permanently, just like Next/Previous. Teacher snapshots include `navigation` entries (`index`, `title`); student and display snapshots omit them.
 
 Unended sessions appear under **Unfinished sessions** on the teacher page, with the lesson title, current step, student count and last activity. **End** (or **End all**) ends them after an inline confirmation, exactly like **End session** in the controls: connected screens show "Session complete", answers are kept, and students can then download the handout. Sessions with no activity for `SESSION_TTL_HOURS` also end automatically. API (teacher login required): `GET /api/rooms`, `POST /api/rooms/:id/end` (404 unknown, 409 already ended) and `POST /api/rooms/end-all` (returns `{ended}`).
 
@@ -186,7 +186,7 @@ Slide bodies and explanations are plain text, but consecutive lines starting wit
 Every handout is a print-ready page at `/handout` that opens the browser's print dialog automatically; choosing **Save as PDF** saves it. The browser does the rendering, so SVG and remote images, tables and symbols such as µ come out exactly as on screen, and the server needs no PDF library.
 
 - **Teacher, saved lesson:** **Download PDF** in the lesson preview (`/handout?lesson=<id>`). Every step with correct answers and explanations.
-- **Teacher, session:** **Download lesson PDF ↗** in the session controls, at any time (`/handout?room=<room id>`). Adds each option's response count.
+- **Teacher, session:** the document-download icon (**Download lesson PDF**) in the session controls, at any time (`/handout?room=<room id>`). Adds each option's response count.
 - **Students:** once the teacher ends the session, the **Session complete** screen shows **Download lesson PDF** (`/handout?room=<code>`). It contains every slide and question with the answers, explanations and the student's own answers, but not class totals. Before the end the handout is refused, so nothing is spoiled.
 
 Videos appear as their title and link. API: `GET /api/handout?lesson=<id>` (teacher) or `GET /api/handout?room=<id or code>`, where a student sends the participant credential from their browser in an `X-Participant` header. A student request returns 409 until the session ends and 403 for a non-participant.

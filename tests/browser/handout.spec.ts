@@ -70,7 +70,7 @@ test('teacher and students download a printable lesson handout',async({page,cont
     await expect(student.getByRole('link',{name:'Download lesson PDF'})).toHaveCount(0);
 
     // Teacher's session copy during class includes class responses.
-    const [sessionCopy]=await Promise.all([context.waitForEvent('page'),page.getByRole('link',{name:'Download lesson PDF ↗'}).click()]);
+    const [sessionCopy]=await Promise.all([context.waitForEvent('page'),page.getByRole('link',{name:'Download lesson PDF',exact:true}).click()]);
     await expect(sessionCopy.getByText('Includes class responses')).toBeVisible();
     await expect(sessionCopy.locator('li.correct')).toContainText('0 of 1 responses');
     await sessionCopy.close();

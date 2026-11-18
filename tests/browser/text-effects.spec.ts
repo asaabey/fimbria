@@ -17,7 +17,7 @@ test('lesson text effects animate once per appearance and remain readable in sta
   const display=await context.newPage();
   const studentContext=await browser.newContext({viewport:{width:375,height:812}});
   try{
-    await display.goto((await page.getByRole('link',{name:'Open presentation display ↗'}).getAttribute('href'))!);
+    await display.goto(page.url().replace('/host/','/display/'));
     await page.getByRole('button',{name:'Begin lesson'}).click();
     const marker=display.locator('.text-marker');
     await expect(marker).toBeVisible();
@@ -34,7 +34,7 @@ test('lesson text effects animate once per appearance and remain readable in sta
         expect(await effect.evaluate(el=>getComputedStyle(el).animationIterationCount)).toBe('1');
       }
     }
-    await expect(page.getByText('1 participants · 0 responses')).toBeVisible();
+    await expect(page.getByRole('img',{name:'1 participants',exact:true})).toBeVisible();
     expect(await marker.evaluate(el=>el.getAnimations()[0].startTime)).toBe(firstStart);
     expect(await student.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     await student.emulateMedia({reducedMotion:'reduce'});
