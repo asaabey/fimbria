@@ -46,12 +46,14 @@ What this means for authors:
 
   For example, `"Check the **potassium** first:\n- ==ECG now==\n- Repeat bloods"`
   shows a line with "potassium" in bold, then two bullets, the first
-  highlighted. Don't add a blank line between list items. Titles, prompts
-  and options are always plain.
+  highlighted. Don't add a blank line between list items. Question `prompt`
+  and each option's `text` support the same inline emphasis and effect tags,
+  but do not turn list prefixes into lists. Titles remain plain.
 
 ## Animated text markup
 
-Use these paired tags inside slide `body` and question `explanation` strings:
+Use these paired tags inside slide `body`, question `prompt`, each option's
+`text`, and question `explanation` strings:
 
 | Markup | Effect in a live lesson | Final appearance |
 | --- | --- | --- |
@@ -74,8 +76,17 @@ Tags are lowercase, must touch their content and close on the **same line**.
 They work in list items and can wrap bold or static highlight markup, e.g.
 `[marker]Notice the **key evidence**.[/marker]`. Do not nest a tag inside itself
 or cross pairs. Unknown, incomplete or mismatched tags remain literal text.
-These tags do not enable HTML or arbitrary CSS. Titles, question prompts,
-answer options, captions and table cells remain plain text.
+These tags do not enable HTML or arbitrary CSS. Titles, captions and table
+cells remain plain text. Formatting in a question is visible to everyone
+before voting; it does not identify the correct answer. Apply emphasis fairly
+across options so styling does not accidentally hint at the answer. Answer
+selection and correctness still use option `id`, never formatted text.
+After the teacher reveals results, the correct answer automatically receives
+a subtle marker sweep in the screen’s selected theme. No tag is needed.
+The final correct-answer highlight takes precedence over an authored
+highlight/marker on that answer, while retaining bold and underline.
+Reduced-motion mode and handouts show the final highlight without motion.
+The slide picker shows question text without the markup characters.
 
 This complete JSON example is ready to upload (no new schema fields needed):
 
@@ -97,6 +108,7 @@ This complete JSON example is ready to upload (no new schema fields needed):
 
 The repository also includes `examples/text-effects.json` with a slide and a
 question explanation demonstrating all three effects.
+`examples/formatted-question.json` demonstrates formatted prompts and options.
 
 ## File structure
 
@@ -162,7 +174,7 @@ Every step needs an `id` (1-100 characters, **unique within the lesson**) and a 
 | Field | Required | Rules |
 |-------|----------|-------|
 | `prompt` | yes | 1-2,000 characters |
-| `options` | yes | 2-8 items, each `{ "id", "text" }`. `id` is 1-100 characters and unique within the question; `text` is 1-1,000 characters |
+| `options` | yes | 2-8 items, each `{ "id", "text" }`. `id` is 1-100 characters and unique within the question; `text` is 1-1,000 characters; `prompt` and option `text` accept inline bold, highlight and effect tags |
 | `correctOptionId` | yes | Must equal one option's `id`. Exactly one correct answer |
 | `explanation` | yes | 0-10,000 characters, shown only after the reveal |
 | `image` | no | See [Images](#images) |

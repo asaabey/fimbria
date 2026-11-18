@@ -17,6 +17,8 @@
   --error-border: #bf7265;
   --highlight: #fbe7a1;
   --on-highlight: #1f2d28;
+  --correct-highlight: #d8ebd9;
+  --on-correct-highlight: #1f4030;
   color: var(--text);
   background: var(--background);
 }
@@ -37,6 +39,8 @@
   --error-border: #bb7966;
   --highlight: #6b5417;
   --on-highlight: #fff4d6;
+  --correct-highlight: #294e3b;
+  --on-correct-highlight: #e6f3e8;
 }
 :root[data-theme="paper"] {
   color-scheme: light;
@@ -55,10 +59,13 @@
   --error-border: #bf7265;
   --highlight: #f5d98a;
   --on-highlight: #3d352a;
+  --correct-highlight: #e5dec0;
+  --on-correct-highlight: #3d352a;
 }
 * { box-sizing: border-box; }
 body { margin: 0; }
 main { max-width: 880px; margin: auto; padding: 32px; }
+.app-shell { min-height: 100dvh; display: flex; flex-direction: column; }
 header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-bottom: 52px; }
 a { color: var(--accent); text-underline-offset: 4px; overflow-wrap: anywhere; }
 .wordmark { font-family: Georgia, "Times New Roman", serif; font-size: 2rem; letter-spacing: -.045em; text-decoration: none; line-height: 1.1; }
@@ -95,34 +102,54 @@ button:hover:not(:disabled) { filter: brightness(.92); }
 .body > ul { list-style: disc; }
 .body li { padding: 0 0 0 .2em; margin: .3em 0; line-height: 1.55; }
 .body li::marker { color: var(--accent); }
-.body strong { font-weight: 700; color: var(--text); }
-.body mark { background: var(--highlight); color: var(--on-highlight); padding: 0 .2em; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+:is(.body, .inline-text) strong { font-weight: 700; color: var(--text); }
+:is(.body, .inline-text) mark { background: var(--highlight); color: var(--on-highlight); padding: 0 .2em; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.inline-text { white-space: pre-wrap; overflow-wrap: anywhere; }
 /* Text effects settle to these static styles in previews and handouts. */
-.body mark.text-marker { background: linear-gradient(var(--highlight), var(--highlight)) 0 85% / 100% 70% no-repeat; }
-.body .text-underline { background: linear-gradient(var(--accent), var(--accent)) 0 100% / 100% 2px no-repeat; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-.body .text-fade { display: inline-block; max-width: 100%; vertical-align: baseline; }
-.in-room .body .text-marker { animation: text-marker-sweep .9s ease-out both; }
-.in-room .body .text-underline { animation: text-underline-draw .75s ease-out both; }
-.in-room .body .text-fade { animation: text-fade-rise .6s ease-out both; }
+:is(.body, .inline-text) mark.text-marker { background: linear-gradient(var(--highlight), var(--highlight)) 0 85% / 100% 70% no-repeat; }
+:is(.body, .inline-text) .text-underline { background: linear-gradient(var(--accent), var(--accent)) 0 100% / 100% 2px no-repeat; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+:is(.body, .inline-text) .text-fade { display: inline-block; max-width: 100%; vertical-align: baseline; }
+.in-room :is(.body, .inline-text) .text-marker { animation: text-marker-sweep .9s ease-out both; }
+.in-room :is(.body, .inline-text) .text-underline { animation: text-underline-draw .75s ease-out both; }
+.in-room :is(.body, .inline-text) .text-fade { animation: text-fade-rise .6s ease-out both; }
 @keyframes text-marker-sweep { from { background-size: 0% 70%; } to { background-size: 100% 70%; } }
 @keyframes text-underline-draw { from { background-size: 0% 2px; } to { background-size: 100% 2px; } }
 @keyframes text-fade-rise { from { opacity: 0; transform: translateY(.35em); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) {
-  .in-room .body .text-marker, .in-room .body .text-underline, .in-room .body .text-fade { animation: none; }
+  .in-room :is(.body, .inline-text) .text-marker, .in-room :is(.body, .inline-text) .text-underline, .in-room :is(.body, .inline-text) .text-fade { animation: none; }
 }
 @media print {
-  .in-room .body .text-marker, .in-room .body .text-underline, .in-room .body .text-fade { animation: none; }
-  .body .text-marker, .body .text-underline { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .in-room :is(.body, .inline-text) .text-marker, .in-room :is(.body, .inline-text) .text-underline, .in-room :is(.body, .inline-text) .text-fade { animation: none; }
+  :is(.body, .inline-text) .text-marker, :is(.body, .inline-text) .text-underline { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
 .body > :last-child { margin-bottom: 0; }
 .body { margin: 0 0 1em; }
 .body.compact { font-size: .9rem; line-height: 1.5; margin: 8px 0; }
 .options { display: grid; gap: 14px; }
+.body.question-explanation { margin-top: 32px; }
 .answer { width: 100%; text-align: left; background: var(--answer); color: var(--text); }
+/* Correctness comes only from the revealed server snapshot, never author markup. */
+.correct-answer-text { background: linear-gradient(var(--correct-highlight), var(--correct-highlight)) 0 85% / 100% 70% no-repeat; color: var(--on-correct-highlight); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.correct-answer-text .inline-text, .correct-answer-text .inline-text strong { color: inherit; }
+/* The reveal colour takes precedence over an author's yellow/marker highlight. */
+.correct-answer-text .inline-text mark { background: none; color: inherit; }
+.correct-answer-text .inline-text .text-marker { animation: none; }
+.options .correct-answer .answer:disabled { opacity: 1; }
+.in-room .correct-answer-text { animation: correct-answer-sweep .9s ease-out both; }
+@keyframes correct-answer-sweep { from { background-size: 0% 70%; } to { background-size: 100% 70%; } }
+@media (prefers-reduced-motion: reduce) { .in-room .correct-answer-text { animation: none; } }
+@media print {
+  :root, :root[data-theme] { --correct-highlight: #d8ebd9; --on-correct-highlight: #111; }
+  .in-room .correct-answer-text { animation: none; }
+  .correct-answer-text { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
 progress { width: 65%; accent-color: var(--accent); }
 nav { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
 .error { padding: 16px; background: var(--error-background); color: var(--error-text); border: 1px solid var(--error-border); }
 footer { margin-top: 56px; font-size: .8rem; letter-spacing: .02em; }
+.app-footer { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 24px; }
+.app-shell > footer.app-footer { margin-top: auto; padding-top: 24px; }
+.app-version { margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; }
 li { padding: 8px; }
 li p { margin: 6px 0; }
 .github-import { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 8px 0 24px; margin: 24px 0; }
@@ -376,7 +403,7 @@ main.handout { max-width: 820px; }
 @media print {
   :root, :root[data-theme] { color-scheme: light; --background: #fff; --surface: #fff; --text: #111; --muted: #555; --accent: #1d4f43; --border: #bbb; --answer: #f0f0f0; }
   @page { margin: 16mm 14mm; }
-  .body mark { --highlight: #fbe7a1; --on-highlight: #111; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  :is(.body, .inline-text) mark { --highlight: #fbe7a1; --on-highlight: #111; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   body { background: #fff; }
   main.handout { max-width: none; padding: 0; font-size: 11pt; }
   .handout-toolbar { display: none; }

@@ -1,9 +1,17 @@
 import {describe,it,expect} from 'vitest';
 import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
-import {BodyText} from '../src/client/BodyText.js';
+import {BodyText,InlineText,plainText} from '../src/client/BodyText.js';
 const html=(text:string)=>renderToStaticMarkup(createElement(BodyText,{text}));
 describe('slide body text',()=>{
+  it('renders inline question markup without introducing lists or HTML',()=>{
+    const text='**Choose** [underline]one[/underline]\n- [marker]<img src=x>[/marker]';
+    const result=renderToStaticMarkup(createElement(InlineText,{text}));
+    expect(result).toBe('<span class="inline-text"><strong>Choose</strong> <span class="text-underline">one</span>\n- <mark class="text-marker">&lt;img src=x&gt;</mark></span>');
+    expect(plainText(text)).toBe('Choose one\n- <img src=x>');
+    expect(plainText('[fade]**Clear** ==point==[/fade]')).toBe('Clear point');
+    expect(plainText('[unknown]literal[/unknown]')).toBe('[unknown]literal[/unknown]');
+  });
   it('turns dash, star and bullet lines into a list and keeps surrounding prose',()=>{
     expect(html('Check:\n- Airway\n* Breathing\n• Circulation\nThen reassess.')).toBe('<div class="body"><p>Check:</p><ul><li>Airway</li><li>Breathing</li><li>Circulation</li></ul><p>Then reassess.</p></div>');
   });

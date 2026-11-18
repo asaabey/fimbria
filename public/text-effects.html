@@ -69,9 +69,36 @@
     @keyframes wave { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-10px); } }
     .paused .sample, .paused .sample span { animation-play-state: paused; }
     .still .sample, .still .sample span { animation: none !important; }
+    .section-intro { max-width: 760px; margin: 40px 0 22px; }
+    .section-intro h2 { font-size: 2rem; margin-bottom: 10px; }
+    .section-intro p { color: #586b63; }
+    .jump-links { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 20px; }
+    .answer-demo .stage { display: block; padding: 18px; min-height: 230px; background: #f5f7f5; }
+    .answer-demo .question { margin: 0 0 16px; font-size: .95rem; font-weight: 600; color: #243832; }
+    .answer-option { padding: 12px; margin-top: 10px; border: 1px solid #d7e0da; border-radius: 6px; background: #fff; font-size: .95rem; line-height: 1.6; overflow-wrap: anywhere; }
+    .answer-letter { margin-right: .3em; }
+    .answer-label { box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+    .answer-result { display: block; visibility: hidden; color: #235e50; font-size: .8rem; font-weight: 600; margin-top: 4px; }
+    .revealed .answer-correct { border-color: #819f91; }
+    .revealed .answer-result { visibility: visible; }
+    .revealed .answer-label { color: #235e50; }
+    .answer-demo .answer-label { animation-duration: calc(var(--duration) * .5); animation-iteration-count: var(--repeat); animation-fill-mode: both; animation-timing-function: ease-out; }
+    .revealed.answer-marker .answer-label { background: linear-gradient(#d8ebd9, #d8ebd9) 0 85% / 100% 65% no-repeat; }
+    .revealed.run.answer-marker .answer-label { animation-name: answer-marker; }
+    @keyframes answer-marker { from { background-size: 0% 65%; } to { background-size: 100% 65%; } }
+    .revealed.answer-underline .answer-label { background: linear-gradient(#235e50, #235e50) 0 100% / 100% 2px no-repeat; }
+    .revealed.run.answer-underline .answer-label { animation-name: answer-underline; }
+    @keyframes answer-underline { from { background-size: 0% 2px; } to { background-size: 100% 2px; } }
+    .answer-emphasis .answer-label { display: inline-block; transform-origin: left center; }
+    .revealed.run.answer-emphasis .answer-label { animation-name: answer-emphasis; }
+    @keyframes answer-emphasis { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.018); text-shadow: 0 0 1px #235e5033; } }
+    .revealed.run.answer-glow .answer-label { animation-name: answer-glow; }
+    @keyframes answer-glow { 0%, 100% { text-shadow: none; } 45% { text-shadow: 0 0 9px #65aa8877; } }
+    .paused .answer-demo .answer-label { animation-play-state: paused; }
+    .still .answer-demo .answer-label { animation: none !important; }
     .motion-note { display: none; }
     @media (prefers-reduced-motion: reduce) {
-      .sample, .sample span { animation: none !important; }
+      .sample, .sample span, .answer-demo .answer-label { animation: none !important; }
       .motion-note { display: block; }
     }
     @media (max-width: 700px) { main { padding: 20px 16px 40px; } .grid { grid-template-columns: 1fr; } article { padding: 18px; } }
@@ -84,7 +111,23 @@
     <p class="eyebrow">A little emphasis. A little motion.</p>
     <h1>Let the words do more.</h1>
     <p class="muted">Try text treatments for a future lesson. The existing <strong>bold</strong> and <mark style="background:#fbe7a1">highlight</mark> are our starting point; these are experiments in drawing attention over time.</p>
+    <nav class="jump-links" aria-label="Playground sections"><a href="#correct-answers">Correct-answer suggestions</a><a href="#text-treatments">General text effects</a></nav>
   </div>
+  <section id="correct-answers" aria-labelledby="answer-heading">
+    <div class="section-intro">
+      <p class="eyebrow">Reveal, then settle</p>
+      <h2 id="answer-heading">A quiet nod to the right answer.</h2>
+      <p>Four suggestions in the context of a multiple-choice question. Reveal each answer to compare, or reveal all together. The wording stays readable throughout, and the final check label makes correctness clear without relying on colour.</p>
+    </div>
+    <div class="controls" aria-label="Correct-answer preview controls">
+      <label for="answer-text">Correct answer text</label>
+      <input id="answer-text" type="text" value="Look for another explanation" maxlength="120">
+      <div class="control-row"><button id="reveal-answers">Reveal all answers</button><button id="reset-answers" class="secondary">Reset answers</button></div>
+      <p class="note muted">Suggested timing: about 900 ms, once when results are revealed. The speed, pause, loop and still-preview controls below also apply here. These are previews; the live quiz is unchanged.</p>
+    </div>
+    <div class="grid" id="answer-effects"></div>
+  </section>
+  <div class="section-intro" id="text-treatments"><h2>General text effects</h2><p>Compare the earlier treatments, or use the controls to adjust all previews.</p></div>
   <div class="controls" aria-label="Playground controls">
     <label for="sample-text">Your sample text</label>
     <input id="sample-text" type="text" value="Pause. Gather. Reassess." maxlength="120">
@@ -99,7 +142,7 @@
     <p class="motion-note note">Your device requests reduced motion, so you’re seeing the final, readable styles.</p>
   </div>
   <div class="grid" id="effects"></div>
-  <footer><p class="note muted">Standalone HTML + CSS. Small JavaScript controls the previews; CSS runs every animation. These effects have not been added to lesson markup.</p><p class="note"><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Animations/Using">How CSS animations work</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion">Reduced-motion support</a></p></footer>
+  <footer><p class="note muted">Standalone HTML + CSS. Small JavaScript controls the previews; CSS runs every animation. Marker sweep, underline draw and fade-and-rise are available as lesson markup. The correct-answer treatments above are isolated previews.</p><p class="note"><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Animations/Using">How CSS animations work</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion">Reduced-motion support</a></p></footer>
 </main>
 <script>
   const effects = [
@@ -114,6 +157,74 @@
     ['glow', 'Soft glow', 'A halo grows and fades without hiding the letters. Try sparingly on key words.', 'text-shadow', 'Decorative'],
     ['wave words', 'Word wave', 'Each word lifts in turn. Each needs its own span; better for playful moments.', 'transform + animation-delay', 'Decorative'],
   ];
+  const answerEffects = [
+    ['answer-marker', '1. Marker sweep', 'A pale green highlight sweeps beneath the answer and remains. Clear on a projector, with no text movement.', 'Recommended'],
+    ['answer-underline', '2. Underline draw', 'A fine green line draws beneath the answer and remains. The most restrained treatment.', 'Recommended'],
+    ['answer-emphasis', '3. Gentle emphasis', 'The answer grows by less than two percent, then settles back. A small acknowledgement without a bounce.', 'Alternative'],
+    ['answer-glow', '4. Soft glow', 'A faint green halo appears once and fades away. The text remains green with the check label.', 'Alternative'],
+  ];
+  const answerGrid = document.querySelector('#answer-effects');
+  function revealAnswer(card) {
+    card.classList.add('revealed');
+    const button = card.querySelector('button');
+    button.textContent = 'Replay reveal ↻';
+    button.setAttribute('aria-label', 'Replay ' + card.querySelector('h2').textContent);
+    replay(card);
+  }
+  for (const [className, title, description, tag] of answerEffects) {
+    const card = document.createElement('article');
+    card.className = 'answer-demo ' + className;
+    const heading = document.createElement('div');
+    heading.className = 'card-heading';
+    const name = document.createElement('h2');
+    name.textContent = title;
+    const button = document.createElement('button');
+    button.className = 'replay';
+    button.textContent = 'Reveal answer';
+    button.setAttribute('aria-label', 'Reveal ' + title);
+    button.addEventListener('click', () => revealAnswer(card));
+    heading.append(name, button);
+    const stage = document.createElement('div');
+    stage.className = 'stage';
+    const question = document.createElement('p');
+    question.className = 'question';
+    question.textContent = 'Which habit helps you reconsider an assumption?';
+    const other = document.createElement('div');
+    other.className = 'answer-option';
+    other.textContent = 'A. Ignore new evidence';
+    const correct = document.createElement('div');
+    correct.className = 'answer-option answer-correct';
+    const letter = document.createElement('span');
+    letter.className = 'answer-letter';
+    letter.textContent = 'B.';
+    const label = document.createElement('span');
+    label.className = 'answer-label';
+    label.textContent = 'Look for another explanation';
+    const result = document.createElement('span');
+    result.className = 'answer-result';
+    result.textContent = '✓ Correct answer';
+    correct.append(letter, document.createTextNode(' '), label, result);
+    stage.append(question, other, correct);
+    const badge = document.createElement('span');
+    badge.className = 'tag';
+    badge.textContent = tag;
+    const detail = document.createElement('p');
+    detail.textContent = description;
+    card.append(heading, stage, badge, detail);
+    answerGrid.append(card);
+  }
+  document.querySelector('#reveal-answers').addEventListener('click', () => answerGrid.querySelectorAll('article').forEach(revealAnswer));
+  document.querySelector('#reset-answers').addEventListener('click', () => {
+    answerGrid.querySelectorAll('article').forEach(card => {
+      card.classList.remove('revealed', 'run');
+      const button = card.querySelector('button');
+      button.textContent = 'Reveal answer';
+      button.setAttribute('aria-label', 'Reveal ' + card.querySelector('h2').textContent);
+    });
+  });
+  document.querySelector('#answer-text').addEventListener('input', event => {
+    answerGrid.querySelectorAll('.answer-label').forEach(label => { label.textContent = event.target.value || 'Look for another explanation'; });
+  });
   const grid = document.querySelector('#effects');
   const input = document.querySelector('#sample-text');
   let paused = false;
@@ -122,7 +233,7 @@
     void card.offsetWidth;
     card.classList.add('run');
   }
-  function replayAll() { grid.querySelectorAll('article').forEach(replay); }
+  function replayAll() { grid.querySelectorAll('article').forEach(replay); answerGrid.querySelectorAll('article.revealed').forEach(replay); }
   for (const [className, title, description, technique, tag] of effects) {
     const card = document.createElement('article');
     const heading = document.createElement('div');
@@ -173,7 +284,7 @@
   document.querySelector('#replay-all').addEventListener('click', replayAll);
   document.querySelector('#pause').addEventListener('click', event => {
     paused = !paused;
-    grid.classList.toggle('paused', paused);
+    document.body.classList.toggle('paused', paused);
     event.currentTarget.setAttribute('aria-pressed', String(paused));
     event.currentTarget.textContent = paused ? 'Resume' : 'Pause';
   });
@@ -186,7 +297,7 @@
     replayAll();
   });
   document.querySelector('#still').addEventListener('change', event => {
-    grid.classList.toggle('still', event.target.checked);
+    document.body.classList.toggle('still', event.target.checked);
     replayAll();
   });
   updateText();

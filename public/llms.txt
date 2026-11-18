@@ -9,7 +9,7 @@ If you are writing lesson content, read the format guide first, then validate ag
 - [Lesson format guide](/docs/lesson-format.md): every field and limit, the rules the schema cannot express, how lessons behave in class, writing guidance and a complete example
 - [Lesson JSON Schema](/lesson.schema.json): JSON Schema draft-07, the source of truth for structure and limits
 
-Slide `body` and question `explanation` support `**bold**`, `==highlight==`, `[marker]words[/marker]`, `[underline]words[/underline]` and `[fade]words[/fade]`. Read the guide for pairing, nesting and playback rules; all other text fields stay plain.
+Slide `body`, question `prompt`, option `text` and question `explanation` support `**bold**`, `==highlight==`, `[marker]words[/marker]`, `[underline]words[/underline]` and `[fade]words[/fade]`. Read the guide for pairing, nesting and playback rules; titles, captions and table cells stay plain. Prompts and options accept inline formatting only, without automatic lists.
 
 ## Notes
 

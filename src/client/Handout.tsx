@@ -2,7 +2,9 @@ import {useEffect,useRef,useState} from 'react';
 import type {Handout as Data} from '../shared/contracts.js';
 import {LessonImage} from './LessonImage.js';
 import {LessonTable} from './LessonTable.js';
-import {BodyText} from './BodyText.js';
+import {BodyText,InlineText} from './BodyText.js';
+import {AppFooter} from './AppFooter.js';
+import {AnswerText} from './AnswerText.js';
 
 // Printable lesson handout. The browser's print dialog saves it as a PDF, which handles
 // every image type (SVG, remote images), tables and symbols without a server-side PDF engine.
@@ -47,16 +49,16 @@ export function Handout(){
         const visual=<>{step.image&&<LessonImage image={step.image} eager/>}</>;
         if(step.type==='slide')return <li key={step.id} className="handout-step"><p className="step-label">{label}</p><h2>{step.title}</h2>{visual}{step.body&&<BodyText text={step.body}/>}{step.table&&<LessonTable table={step.table}/>}</li>;
         const votes=data.totals?.[step.id],total=votes?Object.values(votes).reduce((a,b)=>a+b,0):0,mine=data.answers?.[step.id];
-        return <li key={step.id} className="handout-step"><p className="step-label">{label}</p><h2>{step.prompt}</h2>{visual}{step.table&&<LessonTable table={step.table}/>}
+        return <li key={step.id} className="handout-step"><p className="step-label">{label}</p><h2><InlineText text={step.prompt}/></h2>{visual}{step.table&&<LessonTable table={step.table}/>}
           <ol className="handout-options">{step.options.map((o,i)=>{
             const notes=[o.id===step.correctOptionId&&'✓ Correct answer',mine===o.id&&'Your answer',votes&&`${votes[o.id]||0} of ${total} responses`].filter(Boolean);
-            return <li key={o.id} className={o.id===step.correctOptionId?'correct':undefined}><span className="letter">{String.fromCharCode(65+i)}.</span> {o.text}{notes.length>0&&<span className="option-notes"> — {notes.join(' · ')}</span>}</li>;
+            return <li key={o.id} className={o.id===step.correctOptionId?'correct':undefined}><span className="letter">{String.fromCharCode(65+i)}.</span> <AnswerText text={o.text} correct={o.id===step.correctOptionId}/>{notes.length>0&&<span className="option-notes"> — {notes.join(' · ')}</span>}</li>;
           })}</ol>
           {student&&!mine&&<p className="muted">You did not answer this question.</p>}
           {step.explanation&&<div className="handout-explanation"><h3>Explanation</h3><BodyText text={step.explanation}/></div>}
         </li>;
       })}</ol>
-      <footer>Made with Fimbria · {location.host}</footer>
+      <AppFooter>Made with Fimbria · {location.host}</AppFooter>
     </>}
   </main>;
 }

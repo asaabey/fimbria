@@ -3,14 +3,18 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project uses calendar versioning (`YYYY.MM.DD`).
 
 ## [Unreleased]
 
+## [2026.11.18] - 2026-11-18
+
 ### Added
 
+- Correct answers receive a one-time marker sweep after results are revealed, with light/dark/paper theme colours, full-contrast student buttons and static reduced-motion/handout rendering.
+- Calendar app versioning from package.json, displayed at the bottom right of app screens and handouts, starting at 2026.11.18.
+- Inline bold, highlight, underline and text effects in multiple-choice prompts and answer options across classroom screens, previews and handouts. Voting continues to use unchanged option ids.
 - Paired `[marker]`, `[underline]` and `[fade]` text markup in lesson bodies and explanations, with one-time classroom animation, static preview/handout and reduced-motion styles, authoring docs and an uploadable example.
-
 - Teachers can jump directly to a numbered slide, video or question from Session controls, updating every screen while preserving recorded answers and revealed results.
 - Teacher session screen: a running current-time clock and session timer in the top bar (the timer starts at Begin lesson, uses the server's clock and freezes at the end), and the room code with a join QR pinned to the lower right during the lesson. Rooms record `started` and `ended` times.
 - Teachers can end unfinished sessions from the home page, one at a time or all at once, after confirming (`POST /api/rooms/:id/end`, `POST /api/rooms/end-all`). The list now shows each session's lesson, step, students and last activity.
@@ -32,6 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docker Compose deployment, teacher password setup/reset commands, consistent SQLite backups, and deployment guidance for fimbria.lattice-1.com.
 
 ### Changed
+
+- Add a 32px gap above revealed question explanations on classroom screens.
 
 - Align the teacher's join QR card directly below Session controls in the sticky sidebar instead of floating in the lower right corner.
 - Joins and votes update only the teacher's screen and the voter's own, and broadcasts build each view once per room with the lesson parsed once. One room now serves about 1,000 students with votes accepted in under 0.3 s (p95), up from about 200. Added `scripts/load-test.mjs`, a staged ramp load test.

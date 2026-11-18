@@ -226,3 +226,20 @@ For YouTube, use the same `video` step with a YouTube link in `src`:
 See `examples/youtube.json` for a complete lesson. Watch links, `youtu.be` share links, Shorts, live-video links and embed links are supported. Start times such as `?t=90`, `?t=1m30s` or `?start=90` are preserved. Links must identify a single video; playlist-only and channel links are rejected. Additional URL parameters are not passed to the player.
 
 YouTube steps use the embedded YouTube player in preview and all classroom views, with a **Watch on YouTube** fallback link. They require internet access and embedding enabled by the video owner; unavailable, private or restricted videos may not play in the app. Playback remains manual and independent per screen. Use YouTube's own captions for these steps; `captionsSrc` applies only to MP4 steps. No API key or server-side download is required. Player integration follows [YouTube's embed documentation](https://developers.google.com/youtube/player_parameters).
+
+Multiple-choice question `prompt` and option `text` support the same inline bold, highlight and text effects as bodies/explanations, including on student answer buttons, teacher/display screens, previews and handouts. Prompts/options do not convert list prefixes to lists. Option ids, answer validation and socket contracts are unchanged; formatting is visible before voting and should not hint at the answer. See `examples/formatted-question.json`.
+
+## App versioning
+
+`package.json` is the source of the app version; `package-lock.json` tracks the
+same value. Use calendar releases (`YYYY.M.D` in npm's unpadded numeric format),
+shown as `vYYYY.MM.DD` at the bottom right of the app and handouts. The version
+is bundled at build time, so rebuilding/deploying updates it for all screens.
+It does not change automatically at midnight.
+
+Set the next release with `npm version 2026.11.19 --no-git-tag-version`, then
+validate, build and commit both package files with the release. For another
+release on the same day, use a numeric suffix, e.g. `2026.11.19-2` (displayed as
+`v2026.11.19-2`). This app version is independent of lesson `schemaVersion`.
+
+Revealing results automatically sweeps a theme-aware marker beneath the correct answer on all classroom screens. It runs once per appearance, stays settled during votes/theme changes, and uses static highlighting in reduced-motion mode and handouts. Correct-answer colouring takes precedence over authored yellow/marker highlights; bold and underline remain. No author markup is needed to enable it.

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "formatted-question-demo",
+  "title": "Formatting a multiple-choice question",
+  "steps": [
+    {
+      "id": "reasoning",
+      "type": "question",
+      "prompt": "Which **habit** helps you [underline]reconsider an assumption[/underline]?",
+      "options": [
+        {"id": "a", "text": "[marker]Look for **another explanation**[/marker]"},
+        {"id": "b", "text": "[fade]Ignore ==new evidence==[/fade]"}
+      ],
+      "correctOptionId": "a",
+      "explanation": "[fade]Make room for another possibility.[/fade] Check your first impression against the evidence."
+    }
+  ]
+}

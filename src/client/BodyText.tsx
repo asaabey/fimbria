@@ -16,6 +16,16 @@ export function emphasis(text:string):ReactNode[]{
   return out;
 }
 
+// Inline-only formatting for question prompts and options; never introduces paragraphs or lists.
+export function InlineText({text}:{text:string}){
+  return <span className="inline-text">{emphasis(text)}</span>;
+}
+
+// Native select options need text rather than formatted elements.
+export function plainText(text:string):string{
+  return text.replace(inline,(_match,bold,highlight,_effect,content)=>plainText(bold??highlight??content));
+}
+
 // Slide bodies and explanations are plain text, but authors naturally write lists.
 // Consecutive lines starting with "- ", "* " or "• " become a bulleted list, and lines
 // starting with "1. " or "1) " a numbered list. Everything else keeps its line breaks.
